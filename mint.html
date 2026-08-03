@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mint — ArcPunks</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="smoke-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="wisps" id="wisps" aria-hidden="true"></div>
+  <div class="ghost ghost-1" id="ghost1" aria-hidden="true"></div>
+  <div class="ghost ghost-2" id="ghost2" aria-hidden="true"></div>
+  <div class="sparks" id="sparks" aria-hidden="true"></div>
+  <header>
+    <a href="/" class="brand">ArcPunks</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="/mint">Mint</a>
+      <a href="/marketplace">Marketplace</a>
+    </nav>
+    <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+  <main class="mint-page">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span></div>
+    <h1 class="headline mint-headline">Mint your <span class="accent">ArcPunk</span></h1>
+    <p class="subcopy mint-subcopy">
+      Each punk is uniquely generated onchain. Connect your wallet, choose your quantity, and mint.
+    </p>
+    <div class="mint-card">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="progress-label" id="mintedCount">0 / 10,000</span>
+      </div>
+      <div class="qty-selector">
+        <button class="qty-btn" id="decreaseQty">-</button>
+        <span class="qty-value" id="qtyDisplay">1</span>
+        <button class="qty-btn" id="increaseQty">+</button>
+      </div>
+      <div class="price-row">
+        <span>Total price</span>
+        <span id="totalPrice">TBA</span>
+      </div>
+      <button class="btn btn-primary mint-btn" id="mintBtn">Mint</button>
+      <button class="btn btn-outline mint-btn" id="mintWalletBtn">Connect Wallet</button>
+    </div>
+  </main>
+  <footer class="footer">
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
+  </footer>
+  <script src="js/effects.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+  <script src="js/mint.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>
