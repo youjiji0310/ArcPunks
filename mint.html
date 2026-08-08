@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mint � ArcPunks</title>
+  <title>Mint — ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,11 +27,23 @@
     </button>
   </header>
   <main class="mint-page">
-    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span></div>
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Mint Opens Sept 16, 2026</div>
     <h1 class="headline mint-headline">Mint your <span class="accent">ArcPunk</span></h1>
     <p class="subcopy mint-subcopy">
-      Each punk is uniquely generated onchain. Connect your wallet, choose your quantity, and mint.
+      Each punk is uniquely generated onchain. Connect your wallet now to get ready — minting opens September 16, 2026.
     </p>
+
+    <div class="countdown-card" style="margin: 0 auto 32px;">
+      <p class="countdown-label">Mint opens in</p>
+      <p class="countdown-date">September 16, 2026</p>
+      <div class="countdown-grid">
+        <div class="countdown-unit"><span class="countdown-value" id="cdDays">--</span><span class="countdown-unit-label">Days</span></div>
+        <div class="countdown-unit"><span class="countdown-value" id="cdHours">--</span><span class="countdown-unit-label">Hours</span></div>
+        <div class="countdown-unit"><span class="countdown-value" id="cdMinutes">--</span><span class="countdown-unit-label">Min</span></div>
+        <div class="countdown-unit"><span class="countdown-value" id="cdSeconds">--</span><span class="countdown-unit-label">Sec</span></div>
+      </div>
+    </div>
+
     <div class="mint-card">
       <div class="progress-wrap">
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -51,13 +63,14 @@
     </div>
   </main>
   <footer class="footer">
-    <p>ArcPunks � not affiliated with Arc L1. Built by the community, for the community.</p>
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
     <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
   </footer>
   <script src="js/effects.js"></script>
   <script src="js/wallet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
   <script src="js/mint.js"></script>
+  <script src="js/countdown.js"></script>
   <script src="js/nav.js"></script>
 </body>
 </html>
