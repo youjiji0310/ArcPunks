@@ -229,3 +229,101 @@ main.hero { display: grid; grid-template-columns: 1fr 1.15fr; gap: 40px; padding
 .btn-disabled:hover {
   transform: none !important;
 }
+
+/* ===== Countdown card ===== */
+.countdown-card {
+  background: rgba(14, 30, 51, 0.55);
+  border: 1px solid rgba(62, 201, 242, 0.25);
+  border-radius: 18px;
+  padding: 22px 26px;
+  margin-bottom: 32px;
+  max-width: 460px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.countdown-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.countdown-date {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(5, 6, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 10px 4px;
+}
+
+.countdown-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(62, 201, 242, 0.5);
+}
+
+.countdown-unit-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ===== Polish general ===== */
+.headline {
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.3);
+}
+
+.headline .accent {
+  text-shadow: 0 0 20px rgba(62, 201, 242, 0.35);
+}
+
+.hero-avatar {
+  position: relative;
+}
+
+.hero-avatar::before {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 24px;
+  background: radial-gradient(circle, rgba(62, 201, 242, 0.25), transparent 70%);
+  z-index: -1;
+  filter: blur(8px);
+}
+
+header {
+  backdrop-filter: blur(8px);
+  background: rgba(5, 11, 22, 0.4);
+}
+
+.stat {
+  backdrop-filter: blur(6px);
+  background: rgba(14, 30, 51, 0.5);
+}
+
+@media (max-width: 520px) {
+  .countdown-card { padding: 18px; }
+  .countdown-value { font-size: 1.2rem; }
+}

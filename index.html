@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -44,8 +44,19 @@
         native marketplace unlocks once the collection sells out.
       </p>
 
+      <div class="countdown-card">
+        <p class="countdown-label">Mint opens</p>
+        <p class="countdown-date">September 16, 2026</p>
+        <div class="countdown-grid" id="countdownGrid">
+          <div class="countdown-unit"><span class="countdown-value" id="cdDays">--</span><span class="countdown-unit-label">Days</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdHours">--</span><span class="countdown-unit-label">Hours</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdMinutes">--</span><span class="countdown-unit-label">Min</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdSeconds">--</span><span class="countdown-unit-label">Sec</span></div>
+        </div>
+      </div>
+
       <div class="hero-actions">
-        <a href="/mint" class="btn btn-primary">★ Mint — Coming Soon</a>
+        <a href="/mint" class="btn btn-primary">★ Mint — Sept 16, 2026</a>
         <a href="/marketplace" class="btn btn-outline">◎ View Marketplace</a>
       </div>
     </div>
@@ -94,8 +105,8 @@
       <span class="stat-label">Network</span>
     </div>
     <div class="stat">
-      <span class="stat-value">Soon</span>
-      <span class="stat-label">Marketplace</span>
+      <span class="stat-value">Sept 16</span>
+      <span class="stat-label">Mint Date</span>
     </div>
   </section>
 
@@ -107,6 +118,7 @@
   <script src="js/effects.js"></script>
   <script src="js/wallet.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/countdown.js"></script>
   <script src="js/nav.js"></script>
 </body>
 </html>
