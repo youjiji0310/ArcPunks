@@ -395,3 +395,47 @@ header {
   color: var(--cyan);
   text-decoration: underline;
 }
+
+/* ===== Mint note (OpenSea + snapshot) ===== */
+.mint-note {
+  max-width: 480px;
+  margin: 0 auto 24px;
+  background: var(--panel);
+  border: 1px solid rgba(62, 201, 242, 0.3);
+  border-radius: 14px;
+  padding: 18px 22px;
+  text-align: left;
+}
+
+.mint-note p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.mint-note p:last-child { margin-bottom: 0; }
+
+.mint-note strong { color: var(--cyan); }
+
+/* ===== Mint note (OpenSea + snapshot) ===== */
+.mint-note {
+  max-width: 480px;
+  margin: 0 auto 24px;
+  background: var(--panel);
+  border: 1px solid rgba(62, 201, 242, 0.3);
+  border-radius: 14px;
+  padding: 18px 22px;
+  text-align: left;
+}
+
+.mint-note p {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.mint-note p:last-child { margin-bottom: 0; }
+
+.mint-note strong { color: var(--cyan); }
