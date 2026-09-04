@@ -1,0 +1,239 @@
+/* ==========================================================================
+   Roadmap Cinematic — scroll-driven story engine
+   Scoped entirely under .roadmap-body so it never touches other pages.
+   ========================================================================== */
+
+.roadmap-body {
+  --rc-accent: var(--accent, #7c5cff);
+  --rc-line: rgba(255, 255, 255, 0.12);
+  overflow-x: clip;
+}
+
+/* ---------- Hero: one orchestrated load-in moment ---------- */
+
+.roadmap-intro .eyebrow,
+.roadmap-intro .roadmap-title,
+.roadmap-intro .roadmap-intro-text {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(24px);
+  animation: rc-hero-rise 1.1s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.roadmap-intro .eyebrow { animation-delay: .05s; }
+.roadmap-intro .roadmap-title { animation-delay: .2s; }
+.roadmap-intro .roadmap-intro-text { animation-delay: .45s; }
+
+.roadmap-intro {
+  position: relative;
+}
+
+.roadmap-intro::after {
+  content: "";
+  position: absolute;
+  inset: -20% -10%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--rc-accent) 18%, transparent), transparent 60%);
+  opacity: 0;
+  animation: rc-glow-in 1.8s ease-out .1s forwards;
+  z-index: -1;
+}
+
+@keyframes rc-hero-rise {
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+@keyframes rc-glow-in {
+  to { opacity: 1; }
+}
+
+/* Light sweep across the title once, like a curtain lifting */
+.roadmap-title {
+  position: relative;
+  background-image: linear-gradient(100deg,
+    currentColor 40%,
+    color-mix(in srgb, var(--rc-accent) 70%, white) 50%,
+    currentColor 60%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rc-hero-rise 1.1s cubic-bezier(.16,1,.3,1) forwards,
+             rc-title-sweep 1.6s ease-out .9s forwards;
+}
+
+@keyframes rc-title-sweep {
+  to { background-position: 0% 0; }
+}
+
+/* ---------- Progress rail (desktop) ---------- */
+
+.roadmap-rail {
+  position: fixed;
+  top: 50%;
+  left: 28px;
+  transform: translateY(-50%);
+  height: min(46vh, 420px);
+  width: 20px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roadmap-rail-line {
+  position: relative;
+  width: 2px;
+  height: 100%;
+  background: var(--rc-line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.roadmap-rail-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(180deg, var(--rc-accent), color-mix(in srgb, var(--rc-accent) 40%, transparent));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--rc-accent) 70%, transparent);
+  transition: height .08s linear;
+}
+
+.roadmap-rail-nodes {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.rail-node {
+  width: 9px;
+  height: 9px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--rc-line);
+  border: 1px solid rgba(255,255,255,.25);
+  transition: background .3s ease, box-shadow .3s ease, transform .3s ease;
+}
+
+.rail-node.is-active {
+  background: var(--rc-accent);
+  box-shadow: 0 0 14px 3px color-mix(in srgb, var(--rc-accent) 65%, transparent);
+  transform: scale(1.35);
+}
+
+@media (max-width: 980px) {
+  .roadmap-rail { display: none; }
+}
+
+/* ---------- Scenes: cinematic wipe reveal + parallax ---------- */
+
+.roadmap-scene-media {
+  position: relative;
+  overflow: hidden;
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 1.1s cubic-bezier(.16,1,.3,1);
+}
+
+.roadmap-scene.reverse .roadmap-scene-media {
+  clip-path: inset(0 100% 0 0);
+}
+
+.roadmap-scene.rc-in .roadmap-scene-media {
+  clip-path: inset(0 0 0 0);
+}
+
+.roadmap-scene-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: scale(1.15);
+  transition: transform 1.4s cubic-bezier(.16,1,.3,1);
+  will-change: transform;
+}
+
+.roadmap-scene.rc-in .roadmap-scene-media img {
+  transform: scale(1);
+}
+
+/* subtle continuous parallax drift while the scene is on screen */
+.roadmap-scene-media img {
+  transform: translateY(var(--rc-parallax, 0)) scale(1.15);
+}
+
+.roadmap-scene.rc-in .roadmap-scene-media img {
+  transform: translateY(var(--rc-parallax, 0)) scale(1);
+}
+
+.roadmap-scene-content {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+  transition-delay: .15s;
+}
+
+.roadmap-scene.rc-in .roadmap-scene-content {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.roadmap-scene-content ul li {
+  opacity: 0;
+  transform: translateX(-12px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+
+.roadmap-scene.rc-in .roadmap-scene-content ul li:nth-child(1) { transition-delay: .35s; }
+.roadmap-scene.rc-in .roadmap-scene-content ul li:nth-child(2) { transition-delay: .48s; }
+.roadmap-scene.rc-in .roadmap-scene-content ul li:nth-child(3) { transition-delay: .61s; }
+
+.roadmap-scene.rc-in .roadmap-scene-content ul li {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Phase number: quiet until its scene takes the stage, then it flares */
+.roadmap-scene-number {
+  display: inline-block;
+  position: relative;
+  transition: text-shadow .5s ease, letter-spacing .5s ease;
+}
+
+.roadmap-scene.rc-in .roadmap-scene-number {
+  text-shadow: 0 0 18px color-mix(in srgb, var(--rc-accent) 55%, transparent);
+  letter-spacing: .04em;
+  animation: rc-number-flare .7s ease-out;
+}
+
+@keyframes rc-number-flare {
+  0% { text-shadow: 0 0 0 transparent; }
+  40% { text-shadow: 0 0 28px color-mix(in srgb, var(--rc-accent) 90%, transparent); }
+  100% { text-shadow: 0 0 18px color-mix(in srgb, var(--rc-accent) 55%, transparent); }
+}
+
+/* ---------- Respect people who don't want motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .roadmap-intro .eyebrow,
+  .roadmap-intro .roadmap-title,
+  .roadmap-intro .roadmap-intro-text,
+  .roadmap-scene-media,
+  .roadmap-scene-media img,
+  .roadmap-scene-content,
+  .roadmap-scene-content ul li,
+  .roadmap-scene-number {
+    animation: none !important;
+    transition: none !important;
+    clip-path: inset(0) !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+  .roadmap-rail-fill { transition: none; }
+}
