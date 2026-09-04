@@ -444,3 +444,119 @@ header {
   margin-top: 14px !important;
   margin-bottom: 0 !important;
 }
+
+
+/* ===== Roadmap ===== */
+.roadmap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 56px;
+  border-bottom: 1px solid var(--line);
+}
+
+.roadmap-intro {
+  text-align: center;
+  padding: 80px 20px 60px;
+}
+
+.roadmap-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 16px 0;
+  color: var(--text);
+}
+
+.roadmap-intro-text {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+}
+
+.roadmap-scene {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  max-width: 1100px;
+  margin: 0 auto 90px;
+  padding: 0 20px;
+}
+
+.roadmap-scene.reverse {
+  flex-direction: row-reverse;
+}
+
+.roadmap-scene-media {
+  flex: 1.2;
+  min-width: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.roadmap-scene-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.roadmap-scene-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.roadmap-scene-number {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cyan);
+  background: var(--panel);
+  border: 1px solid rgba(62, 201, 242, 0.3);
+  border-radius: 20px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+}
+
+.roadmap-scene-content h2 {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.roadmap-scene-content p {
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.roadmap-scene-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.roadmap-scene-content li {
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  padding-left: 22px;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.roadmap-scene-content li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--cyan);
+}
+
+@media (max-width: 900px) {
+  .roadmap-scene, .roadmap-scene.reverse {
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 50px;
+  }
+  .roadmap-title { font-size: 2.2rem; }
+  .roadmap-header { padding: 16px 20px; }
+}
