@@ -560,3 +560,172 @@ header {
   .roadmap-title { font-size: 2.2rem; }
   .roadmap-header { padding: 16px 20px; }
 }
+
+
+
+
+/* ===== Whitelist — simple ===== */
+.whitelist-page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  text-align: center;
+}
+
+.whitelist-headline { font-size: 2.4rem; margin-bottom: 12px; }
+.whitelist-subcopy { margin: 0 auto 32px; }
+
+.whitelist-simple-steps {
+  text-align: left;
+  list-style: decimal;
+  padding-left: 20px;
+  margin: 0 auto 40px;
+  max-width: 420px;
+  color: var(--text-dim);
+}
+
+.whitelist-simple-steps li {
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.whitelist-simple-steps a {
+  color: var(--cyan);
+  text-decoration: underline;
+}
+
+.whitelist-form-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+  text-align: left;
+}
+
+#whitelistForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#whitelistForm input {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+#whitelistForm input::placeholder { color: var(--text-dimmer); }
+
+#whitelistForm button {
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.whitelist-success {
+  text-align: center;
+  padding: 10px 0;
+  color: var(--cyan);
+  font-size: 0.95rem;
+}
+
+.whitelist-form-status {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 0.88rem;
+}
+
+.whitelist-form-status.error { color: #ff6b6b; }
+
+/* ===== Whitelist page ===== */
+.whitelist-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  text-align: center;
+}
+
+.whitelist-headline { font-size: 2.6rem; margin-bottom: 14px; }
+.whitelist-subcopy { margin: 0 auto 40px; }
+
+.whitelist-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.whitelist-step-card {
+  display: block;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 18px;
+  text-align: left;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.whitelist-step-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(62, 201, 242, 0.4);
+}
+
+.whitelist-step-card h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 10px 0 6px;
+}
+
+.whitelist-step-card p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.whitelist-form-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 32px;
+  text-align: left;
+}
+
+.whitelist-form-card h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+#whitelistForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#whitelistForm input {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+#whitelistForm input::placeholder { color: var(--text-dimmer); }
+
+.whitelist-form-status {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.9rem;
+}
+
+.whitelist-form-status.success { color: var(--cyan); }
+.whitelist-form-status.error { color: #ff6b6b; }
+
+@media (max-width: 700px) {
+  .whitelist-steps { grid-template-columns: 1fr; }
+}
