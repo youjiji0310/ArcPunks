@@ -767,3 +767,49 @@ header {
 
 .whitelist-check-result.success { color: var(--cyan); }
 .whitelist-check-result.error { color: #ff6b6b; }
+
+/* ===== Whitelist celebration ===== */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  animation-name: confetti-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+}
+
+.whitelist-checker-card.celebrate {
+  animation: celebrate-pulse 0.6s ease;
+  border-color: var(--cyan);
+  box-shadow: 0 0 40px rgba(62, 201, 242, 0.35);
+}
+
+@keyframes celebrate-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.whitelist-check-result.success strong {
+  font-size: 1.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { animation: none !important; display: none; }
+  .whitelist-checker-card.celebrate { animation: none !important; }
+}
