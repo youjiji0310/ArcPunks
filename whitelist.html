@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whitelist — ArcPunks</title>
+  <title>Whitelist Checker — ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -26,10 +26,14 @@
 
   <main class="whitelist-page">
     <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Submissions Closed</div>
-    <h1 class="headline whitelist-headline">Whitelist <span class="accent">Checker</span> Soon</h1>
-    <p class="subcopy whitelist-subcopy">
-      Submissions are closed. Wallets are being verified. Come back soon to check if you're whitelisted.
-    </p>
+    <h1 class="headline whitelist-headline">Whitelist <span class="accent">Checker</span></h1>
+    <p class="subcopy whitelist-subcopy">Enter your wallet address to check your whitelist status.</p>
+
+    <div class="whitelist-checker-card">
+      <input type="text" id="checkWalletInput" placeholder="0x...">
+      <button class="btn btn-primary" id="checkWalletBtn">Check Eligibility</button>
+      <div id="checkResult" class="whitelist-check-result"></div>
+    </div>
   </main>
 
   <footer class="footer">
@@ -39,6 +43,7 @@
 
   <script src="js/effects.js"></script>
   <script src="js/wallet.js"></script>
+  <script src="js/whitelist-checker.js"></script>
   <script src="js/nav.js"></script>
 </body>
 </html>

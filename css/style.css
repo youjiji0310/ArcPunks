@@ -729,3 +729,41 @@ header {
 @media (max-width: 700px) {
   .whitelist-steps { grid-template-columns: 1fr; }
 }
+
+/* ===== Whitelist checker ===== */
+.whitelist-checker-card {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+#checkWalletInput {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  margin-bottom: 14px;
+}
+
+#checkWalletInput::placeholder { color: var(--text-dimmer); }
+
+.whitelist-checker-card .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.whitelist-check-result {
+  text-align: center;
+  margin-top: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.whitelist-check-result.success { color: var(--cyan); }
+.whitelist-check-result.error { color: #ff6b6b; }
