@@ -1,14 +1,12 @@
-const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const PUNK_TOKEN_ADDRESS = "0x3980594AF0E0A27436B3bAB04235E65131b26d94";
 const STAKING_CONTRACT_ADDRESS = "0x86e233f0c3786C2612759b7d51a72c206FF4cb4C";
-const RPC_URL = "https://rpc.arc-scan.org";
 
 const NFT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
   "function isApprovedForAll(address owner, address operator) view returns (bool)",
   "function setApprovalForAll(address operator, bool approved) external",
-  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)"
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
 const PUNK_ABI = [
@@ -33,10 +31,6 @@ let stakedTokenIds = [];
 let walletTokenIds = [];
 let liveRewards = {};
 let dailyRate = 0.25;
-
-function shorten(addr) {
-  return addr.slice(0, 6) + "..." + addr.slice(-4);
-}
 
 async function initStaking() {
   if (!walletState.connected || !walletState.provider) return;
@@ -113,21 +107,32 @@ async function loadStakedTokens() {
   }
 }
 
+// Trouve les vrais NFT possedes en cherchant l'historique des transferts (pas Enumerable)
 async function loadWalletTokens() {
   walletTokenIds = [];
   try {
-    const balance = await nftContract.balanceOf(userAddress);
-    const count = Number(balance);
-    for (let i = 0; i < count; i++) {
-      try {
-        const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
-        walletTokenIds.push(tokenId.toString());
-      } catch (err) {
-        break;
-      }
-    }
+    const receivedFilter = nftContract.filters.Transfer(null, userAddress);
+    const receivedEvents = await nftContract.queryFilter(receivedFilter, 0, "latest");
+
+    const candidateIds = new Set(receivedEvents.map(e => e.args.tokenId.toString()));
+
+    // Verifie que le wallet possede TOUJOURS chaque token (pas revendu depuis), et qu'il n'est pas deja staked
+    const checks = await Promise.all(
+      Array.from(candidateIds).map(async (tokenId) => {
+        if (stakedTokenIds.includes(tokenId)) return null;
+        try {
+          const currentOwner = await nftContract.ownerOf(tokenId);
+          return currentOwner.toLowerCase() === userAddress.toLowerCase() ? tokenId : null;
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    walletTokenIds = checks.filter(id => id !== null);
   } catch (err) {
-    console.warn("Enumeration not available, use manual stake input.");
+    console.error("Error loading wallet tokens:", err);
+    walletTokenIds = [];
   }
 }
 
@@ -135,9 +140,10 @@ function renderStakedGrid() {
   const grid = document.getElementById("stakedGrid");
   const emptyMsg = document.getElementById("stakedEmptyMsg");
   const countLabel = document.getElementById("stakedCountLabel");
+  const statStakedCount = document.getElementById("statStakedCount");
 
   countLabel.textContent = `(${stakedTokenIds.length})`;
-  document.getElementById("statStakedCount").textContent = stakedTokenIds.length;
+  if (statStakedCount) statStakedCount.textContent = stakedTokenIds.length;
   grid.innerHTML = "";
 
   if (stakedTokenIds.length === 0) {
@@ -152,7 +158,6 @@ function renderStakedGrid() {
     card.innerHTML = `
       <div class="staking-card-header">
         <span class="staking-card-id">ArcPunk #${tokenId}</span>
-        <span class="staking-gear spin">?</span>
       </div>
       <div class="staking-reward-display">
         <span class="staking-reward-value" id="reward-${tokenId}">0.0000</span>
@@ -172,9 +177,11 @@ function renderStakedGrid() {
 }
 
 function renderWalletGrid() {
-  document.getElementById("statWalletCount").textContent = walletTokenIds.length;
   const grid = document.getElementById("walletGrid");
   const emptyMsg = document.getElementById("walletEmptyMsg");
+  const statWalletCount = document.getElementById("statWalletCount");
+
+  if (statWalletCount) statWalletCount.textContent = walletTokenIds.length;
   grid.innerHTML = "";
 
   if (walletTokenIds.length === 0) {
@@ -264,7 +271,7 @@ async function updateLockStatuses() {
       const can = await stakingContract.canUnstake(tokenId);
       const el = document.getElementById(`lock-${tokenId}`);
       if (el) {
-        el.textContent = can ? "? Unlocked" : "?? Locked (7-day minimum)";
+        el.textContent = can ? "✓ Unlocked" : "🔒 Locked (7-day minimum)";
         el.className = "staking-lock-status " + (can ? "unlocked" : "locked");
       }
     } catch (err) {}
@@ -307,7 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error(err);
         alert("Approval failed: " + (err.reason || err.message));
         approveBtn.disabled = false;
-        approveBtn.textContent = "Approve Vault";
+        approveBtn.textContent = "Approve Reactor";
       }
     });
   }
