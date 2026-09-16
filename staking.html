@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staking — ArcPunks</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="smoke-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="wisps" id="wisps" aria-hidden="true"></div>
+  <div class="sparks" id="sparks" aria-hidden="true"></div>
+
+  <header>
+    <a href="/" class="brand">ArcPunks</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="/profile">My Punks</a>
+      <a href="/roadmap">Roadmap</a>
+      <a href="/staking">Staking</a>
+    </nav>
+    <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="reactor-page">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Staking Reactor Online</div>
+    <h1 class="headline staking-headline">Stake &amp; <span class="accent">Earn $PUNK</span></h1>
+    <p class="subcopy staking-subcopy">
+      Load your ArcPunks into the reactor. Each unit generates $PUNK continuously. Minimum containment period applies before extraction.
+    </p>
+
+    <!-- REACTOR CORE -->
+    <div class="reactor-core-wrap">
+      <svg class="reactor-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="200" cy="200" r="180" class="reactor-ring-outer"/>
+        <circle cx="200" cy="200" r="180" class="reactor-ring-dash"/>
+        <circle cx="200" cy="200" r="140" class="reactor-ring-mid"/>
+
+        <g class="gear-group gear-slow" style="transform-origin:200px 200px;">
+          <g class="gear-shape" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="200" cy="60" r="16"/>
+            <circle cx="340" cy="200" r="16"/>
+            <circle cx="200" cy="340" r="16"/>
+            <circle cx="60" cy="200" r="16"/>
+          </g>
+        </g>
+
+        <g class="gear-group gear-fast-rev" style="transform-origin:200px 200px;">
+          <circle cx="200" cy="105" r="9" class="gear-dot"/>
+          <circle cx="295" cy="200" r="9" class="gear-dot"/>
+          <circle cx="200" cy="295" r="9" class="gear-dot"/>
+          <circle cx="105" cy="200" r="9" class="gear-dot"/>
+        </g>
+
+        <circle cx="200" cy="200" r="90" class="reactor-core-glow"/>
+        <circle cx="200" cy="200" r="70" class="reactor-core-inner"/>
+      </svg>
+
+      <div class="reactor-center-readout">
+        <span class="reactor-center-label">$PUNK Balance</span>
+        <span class="reactor-center-value" id="statBalance">0.00</span>
+      </div>
+
+      <div class="pipe pipe-left"></div>
+      <div class="pipe pipe-right"></div>
+    </div>
+
+    <div class="reactor-panel">
+      <div class="reactor-panel-item">
+        <div class="reactor-panel-icon lock-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        </div>
+        <div class="reactor-panel-text">
+          <span class="reactor-panel-value" id="statLockDays">7</span>
+          <span class="reactor-panel-label">Days Containment</span>
+        </div>
+      </div>
+      <div class="reactor-panel-divider"></div>
+      <div class="reactor-panel-item">
+        <div class="reactor-panel-icon loaded-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <div class="reactor-panel-text">
+          <span class="reactor-panel-value" id="statStakedCount">0</span>
+          <span class="reactor-panel-label">Units Loaded</span>
+        </div>
+      </div>
+      <div class="reactor-panel-divider"></div>
+      <div class="reactor-panel-item">
+        <div class="reactor-panel-icon available-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9a2 2 0 0 0-2 2v9"/><rect x="3" y="3" width="7" height="7" rx="1"/><circle cx="17" cy="17" r="4"/></svg>
+        </div>
+        <div class="reactor-panel-text">
+          <span class="reactor-panel-value" id="statWalletCount">0</span>
+          <span class="reactor-panel-label">Units Available</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="stakingConnectPrompt" class="staking-connect-prompt">
+      <button class="btn btn-primary" id="stakingConnectBtn">Connect Wallet to Power On</button>
+    </div>
+
+    <div id="stakingApprovalPrompt" class="staking-approval-prompt" style="display:none;">
+      <p>Authorize the reactor to load and unload your ArcPunks.</p>
+      <button class="btn btn-primary" id="approveBtn">Approve Reactor</button>
+    </div>
+
+    <div id="stakingContent" class="staking-content" style="display:none;">
+
+      <div class="conveyor-divider" aria-hidden="true">
+        <div class="conveyor-track"></div>
+      </div>
+
+      <section class="staking-section">
+        <h2 class="staking-section-title">Loaded in Reactor <span id="stakedCountLabel">(0)</span></h2>
+        <div id="stakedGrid" class="staking-grid"></div>
+        <p id="stakedEmptyMsg" class="staking-empty-msg" style="display:none;">No units loaded yet. Load a punk below to start generating $PUNK.</p>
+      </section>
+
+      <div class="conveyor-divider" aria-hidden="true">
+        <div class="conveyor-track"></div>
+      </div>
+
+      <section class="staking-section">
+        <h2 class="staking-section-title">Available in Wallet</h2>
+        <div id="walletGrid" class="staking-grid"></div>
+        <p id="walletEmptyMsg" class="staking-empty-msg" style="display:none;">No unstaked ArcPunks found in this wallet.</p>
+        <div class="staking-manual">
+          <p>Don't see your punk? Load by Token ID:</p>
+          <div class="staking-manual-row">
+            <input type="number" id="manualTokenId" placeholder="Token ID (e.g. 42)" min="1">
+            <button class="btn btn-outline" id="manualStakeBtn">Load</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
+  </footer>
+
+  <script src="js/effects.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+  <script src="js/staking.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>
