@@ -3,27 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whitelist — ArcPunks</title>
+  <title>Whitelist Checker — ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="smoke-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-  <div class="wisps" id="wisps" aria-hidden="true"></div>
-  <div class="ghost ghost-1" id="ghost1" aria-hidden="true"></div>
-  <div class="ghost ghost-2" id="ghost2" aria-hidden="true"></div>
-  <div class="sparks" id="sparks" aria-hidden="true"></div>
-
   <header>
     <a href="/" class="brand">ArcPunks</a>
     <nav class="nav-links" id="navLinks">
       <a href="/mint">Mint</a>
       <a href="/profile">My Punks</a>
       <a href="/roadmap">Roadmap</a>
-      <a href="/staking">Staking</a>
-      <a href="/whitelist">Whitelist</a>
+      <a href="/whitelist">Checker</a>
     </nav>
     <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
     <button class="nav-toggle" id="navToggle" aria-label="Menu">
@@ -32,41 +25,14 @@
   </header>
 
   <main class="whitelist-page">
-    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Whitelist Spots Open</div>
-    <h1 class="headline whitelist-headline">Get on the <span class="accent">Whitelist</span></h1>
-    <p class="subcopy whitelist-subcopy">
-      Complete the 3 steps below, then submit your info. We'll manually verify and whitelist your wallet before mint.
-    </p>
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Submissions Closed</div>
+    <h1 class="headline whitelist-headline">Whitelist <span class="accent">Checker</span></h1>
+    <p class="subcopy whitelist-subcopy">Enter your wallet address to check your whitelist status.</p>
 
-    <div class="whitelist-steps">
-      <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="whitelist-step-card">
-        <span class="community-step">01</span>
-        <h3>Follow @Arc_Punks</h3>
-        <p>Hit follow on X to stay updated.</p>
-      </a>
-
-      <a href="https://x.com/Arc_Punks/status/2096636475546726456" target="_blank" rel="noopener noreferrer" class="whitelist-step-card">
-        <span class="community-step">02</span>
-        <h3>Like &amp; Retweet</h3>
-        <p>Like and retweet the pinned post.</p>
-      </a>
-
-      <a href="https://x.com/Arc_Punks/status/2096636475546726456" target="_blank" rel="noopener noreferrer" class="whitelist-step-card">
-        <span class="community-step">03</span>
-        <h3>Comment</h3>
-        <p>Leave a comment on the same post, then copy the link to your comment.</p>
-      </a>
-    </div>
-
-    <div class="whitelist-form-card">
-      <h3>Submit Your Entry</h3>
-      <form id="whitelistForm">
-        <input type="text" id="xUsername" placeholder="Your X username (e.g. @yourname)" required>
-        <input type="text" id="wallet" placeholder="Your wallet address (0x...)" required>
-        <input type="url" id="commentLink" placeholder="Link to your comment " required>
-        <button type="submit" class="btn btn-primary" id="submitBtn">Submit for Whitelist</button>
-      </form>
-      <p id="formStatus" class="whitelist-form-status"></p>
+    <div class="whitelist-checker-card">
+      <input type="text" id="checkWalletInput" placeholder="0x...">
+      <button class="btn btn-primary" id="checkWalletBtn">Check Eligibility</button>
+      <div id="checkResult" class="whitelist-check-result"></div>
     </div>
   </main>
 
@@ -77,7 +43,7 @@
 
   <script src="js/effects.js"></script>
   <script src="js/wallet.js"></script>
-  <script type="module" src="js/whitelist.js"></script>
+  <script src="js/whitelist-checker.js"></script>
   <script src="js/nav.js"></script>
 </body>
 </html>
