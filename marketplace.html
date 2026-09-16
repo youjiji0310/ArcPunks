@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace â€” ArcPunks</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="smoke-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="wisps" id="wisps" aria-hidden="true"></div>
+  <div class="ghost ghost-1" id="ghost1" aria-hidden="true"></div>
+  <div class="ghost ghost-2" id="ghost2" aria-hidden="true"></div>
+  <div class="sparks" id="sparks" aria-hidden="true"></div>
+
+  <header>
+    <a href="/" class="brand">ArcPunks</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="/mint">Mint</a>
+      <a href="/profile">My Punks</a>
+    </nav>
+    <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="soon-page">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Marketplace</div>
+    <h1 class="headline soon-headline">Marketplace <span class="accent">Soon</span></h1>
+    <p class="subcopy soon-subcopy">
+      The native ArcPunks marketplace unlocks the moment all 10,000 punks are minted.
+      Trade directly onchain, no middlemen â€” drop your email and we'll notify you the second it opens.
+    </p>
+
+    <div class="soon-mosaic" id="soonMosaic"></div>
+
+    <div class="notify-box">
+      <input type="email" placeholder="your email to get notified" class="notify-input" id="notifyInput">
+      <button class="btn btn-primary" id="notifyBtn">Notify Me</button>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>ArcPunks â€” not affiliated with Arc L1. Built by the community, for the community.</p>
+    <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
+  </footer>
+
+  <script src="js/effects.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/marketplace.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>

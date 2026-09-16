@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ArcPunks — 10,000 Punks Onchain</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home-cinematic.css">
+</head>
+<body>
+
+  <div class="smoke-layer" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="wisps" id="wisps" aria-hidden="true"></div>
+  <div class="ghost ghost-1" id="ghost1" aria-hidden="true"></div>
+  <div class="ghost ghost-2" id="ghost2" aria-hidden="true"></div>
+  <div class="sparks" id="sparks" aria-hidden="true"></div>
+
+  <header>
+    <a href="/" class="brand">ArcPunks</a>
+            <nav class="nav-links" id="navLinks">
+      <a href="/mint">Mint</a>
+      <a href="/profile">My Punks</a>
+      <a href="/roadmap">Roadmap</a>
+      <a href="/staking">Staking</a>
+      <a href="/whitelist">Whitelist</a>
+    </nav>
+    <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="hero">
+    <div class="hero-content">
+      <div class="eyebrow"><span class="dot"></span> ArcPunks Collection</div>
+
+      <div class="hero-avatar">
+        <img src="assets/images/punks/1.png" alt="Featured ArcPunk">
+      </div>
+
+      <h1 class="headline">The first punks<br>on <span class="accent">Arc Chain.</span></h1>
+
+      <p class="subcopy">
+        10,000 uniquely generated ArcPunks, built for Arc L1. Mint straight from your wallet &
+        native marketplace unlocks once the collection sells out.
+      </p>
+
+      <div class="countdown-card">
+        <p class="countdown-label">Mint opens</p>
+        <p class="countdown-date">September 16, 2026</p>
+        <div class="countdown-grid" id="countdownGrid">
+          <div class="countdown-unit"><span class="countdown-value" id="cdDays">--</span><span class="countdown-unit-label">Days</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdHours">--</span><span class="countdown-unit-label">Hours</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdMinutes">--</span><span class="countdown-unit-label">Min</span></div>
+          <div class="countdown-unit"><span class="countdown-value" id="cdSeconds">--</span><span class="countdown-unit-label">Sec</span></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="/mint" class="btn btn-primary">Mint via OpenSea - Sept 16</a>
+        <a href="/marketplace" class="btn btn-outline">View Marketplace</a>
+      </div>
+    </div>
+
+    <div class="grid-wrap">
+      <div class="punk-grid" id="punkGrid"></div>
+    </div>
+  </main>
+
+  <section class="marquee-wrap">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </section>
+
+  <section class="community-section">
+    <div class="eyebrow" style="justify-content:center; margin: 0 auto 20px;"><span class="dot"></span> Early Access</div>
+    <h2 class="community-title">Join the squad.<br><span class="accent">Get in early.</span></h2>
+    <p class="subcopy community-subcopy">
+      Follow us and retweet the pinned post — that's it. We track engagement directly on X
+      and early access goes to the real ones who showed up for the hype from day one.
+    </p>
+
+    <div class="community-cards">
+      <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="community-card">
+        <span class="community-step">01</span>
+        <h3>Follow @Arc_Punks</h3>
+        <p>Hit follow on X to stay updated on mint dates and drops.</p>
+        <span class="btn btn-primary community-btn">Follow on X</span>
+      </a>
+
+      <a href="https://x.com/Arc_Punks/status/2045329020724658483" target="_blank" rel="noopener noreferrer" class="community-card">
+        <span class="community-step">02</span>
+        <h3>Retweet the Post</h3>
+        <p>Repost the pinned announcement so more punks can find us.</p>
+        <span class="btn btn-primary community-btn">Retweet</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="stat-value">10,000</span>
+      <span class="stat-label">Total Supply</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">ARC L1</span>
+      <span class="stat-label">Network</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">Sept 16</span>
+      <span class="stat-label">Mint Date</span>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
+  </footer>
+
+  <script src="js/effects.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/home-cinematic.js"></script>
+  <script src="js/countdown.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>
