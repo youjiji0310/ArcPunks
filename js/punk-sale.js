@@ -1,6 +1,6 @@
 ﻿const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
 const SALE_CONTRACT_ADDRESS = "0x5581a479c2Cf5FC281f457A27687063805a3BE27";
-const READ_RPC_URL = "https://rpc.arc-scan.org";
+const READ_RPC_URLS = ["https://rpc.arc-scan.org", "https://ethereum-rpc.publicnode.com"];
 
 const SALE_ABI = [
   "function buy(uint256 amount) external payable",
@@ -15,37 +15,59 @@ let provider, signer, saleContract;
 let pricePer500Wei = ethers.parseEther("0.5");
 let selectedAmount = 0;
 
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+async function withRetry(fn, attempts = 4) {
+  let lastErr;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      await sleep(700 * (i + 1));
+    }
+  }
+  throw lastErr;
+}
+
+function getReadProvider() {
+  return new ethers.JsonRpcProvider(READ_RPC_URLS[0]);
+}
+
 async function refreshSaleStats() {
   try {
-    const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
-    const readSale = new ethers.Contract(SALE_CONTRACT_ADDRESS, SALE_ABI, readProvider);
-    const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
+    await withRetry(async () => {
+      const readProvider = getReadProvider();
+      const readSale = new ethers.Contract(SALE_CONTRACT_ADDRESS, SALE_ABI, readProvider);
+      const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
 
-    const [sold, remaining, price] = await Promise.all([
-      readSale.totalSold(),
-      readToken.balanceOf(SALE_CONTRACT_ADDRESS),
-      readSale.pricePer500()
-    ]);
+      const sold = await readSale.totalSold();
+      const remaining = await readToken.balanceOf(SALE_CONTRACT_ADDRESS);
+      const price = await readSale.pricePer500();
 
-    pricePer500Wei = price;
-    document.getElementById("statSold").textContent = Number(ethers.formatEther(sold)).toLocaleString();
-    document.getElementById("buySoldDetail").textContent =
-      Number(ethers.formatEther(remaining)).toLocaleString() + " $PUNK remaining in this sale";
+      pricePer500Wei = price;
+      document.getElementById("statSold").textContent = Number(ethers.formatEther(sold)).toLocaleString();
+      document.getElementById("buySoldDetail").textContent =
+        Number(ethers.formatEther(remaining)).toLocaleString() + " $PUNK remaining in this sale";
+    });
   } catch (err) {
-    console.warn("Could not load sale stats:", err.message);
+    console.warn("Could not load sale stats after retries:", err.message);
+    document.getElementById("statSold").textContent = "—";
   }
 }
 
 async function refreshMyBalance() {
   if (!walletState.connected) return;
   try {
-    const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
-    const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
-    const bal = await readToken.balanceOf(walletState.address);
-    document.getElementById("statMyBalance").textContent = Number(ethers.formatEther(bal)).toLocaleString();
+    await withRetry(async () => {
+      const readProvider = getReadProvider();
+      const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
+      const bal = await readToken.balanceOf(walletState.address);
+      document.getElementById("statMyBalance").textContent = Number(ethers.formatEther(bal)).toLocaleString();
+    });
   } catch (err) {
-    console.warn("Could not load balance:", err.message);
-    document.getElementById("statMyBalance").textContent = "0";
+    console.warn("Could not load balance after retries:", err.message);
+    document.getElementById("statMyBalance").textContent = "—";
   }
 }
 
@@ -111,7 +133,11 @@ async function doBuy() {
     await refreshMyBalance();
   } catch (err) {
     console.error(err);
-    statusEl.textContent = "Purchase failed: " + (err.reason || err.message);
+    if (err.code === "ACTION_REJECTED") {
+      statusEl.textContent = "Transaction cancelled.";
+    } else {
+      statusEl.textContent = "Purchase failed: " + (err.reason || err.message);
+    }
     statusEl.className = "punk-buy-status error";
   }
 
