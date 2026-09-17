@@ -1,4 +1,4 @@
-﻿const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const CONTRACT_ABI = ["function ownerOf(uint256 tokenId) view returns (address)"];
 
 let userAddress = "";
@@ -11,7 +11,7 @@ function storageKey() {
 function loadOwnedIds() {
   try {
     const raw = localStorage.getItem(storageKey());
-    ownedTokenIds = raw ? JSON.parse(raw) : [];
+    ownedTokenIds = raw ? [...new Set(JSON.parse(raw))] : [];
   } catch {
     ownedTokenIds = [];
   }
@@ -42,8 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "profile-card";
       card.innerHTML =
-        "<div class=\"profile-card-placeholder\">ArcPunk #" + tokenId + "</div>" +
-        "<p class=\"profile-card-id\">ArcPunk #" + tokenId + "</p>";
+        "<div class=\"profile-card-visual\"><span class=\"profile-card-number\">#" + tokenId + "</span></div>" +
+        "<div class=\"profile-card-footer\"><span class=\"profile-card-name\">ArcPunk</span><a href=\"https://opensea.io/assets/arc/" + CONTRACT_ADDRESS + "/" + tokenId + "\" target=\"_blank\" class=\"profile-card-link\">View on OpenSea</a></div>";
       grid.appendChild(card);
     });
   }
@@ -64,10 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const owner = await contract.ownerOf(tokenId);
 
       if (owner.toLowerCase() === userAddress.toLowerCase()) {
-        if (!ownedTokenIds.includes(tokenId.toString())) {
-          ownedTokenIds.push(tokenId.toString());
-          saveOwnedIds();
-        }
+        ownedTokenIds = [...new Set([...ownedTokenIds, tokenId.toString()])]; saveOwnedIds();
         addResult.textContent = "Added ArcPunk #" + tokenId + " to your collection.";
         addResult.className = "whitelist-check-result success";
         renderGrid();
