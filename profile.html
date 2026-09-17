@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Punks â€” ArcPunks</title>
+  <title>My Punks — ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 
   <header>
     <a href="/" class="brand">ArcPunks</a>
-               <nav class="nav-links" id="navLinks">
+    <nav class="nav-links" id="navLinks">
       <a href="/profile">My Punks</a>
       <a href="/roadmap">Roadmap</a>
       <a href="/staking">Staking</a>
@@ -32,23 +32,23 @@
   <main class="profile-page">
     <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Your Collection</div>
     <h1 class="headline profile-headline">My <span class="accent">ArcPunks</span></h1>
-    <p class="subcopy profile-subcopy">
-      Connect your wallet to see the ArcPunks you own.
-    </p>
+    <p class="subcopy profile-subcopy">Connect your wallet, then add your ArcPunks by Token ID.</p>
 
     <div id="profileEmptyState" class="profile-empty">
       <button class="btn btn-primary" id="profileConnectBtn">Connect Wallet</button>
     </div>
 
-    <div id="profileLoading" class="profile-loading" style="display:none;">
-      Loading your punks...
+    <div id="profileManualAdd" class="whitelist-checker-card" style="display:none; margin-bottom: 32px;">
+      <input type="text" id="manualAddTokenId" placeholder="Enter your ArcPunk Token ID">
+      <button class="btn btn-primary" id="manualAddBtn">Add to My Punks</button>
+      <div id="manualAddResult" class="whitelist-check-result"></div>
     </div>
 
     <div id="profileGrid" class="profile-grid"></div>
   </main>
 
   <footer class="footer">
-    <p>ArcPunks â€” not affiliated with Arc L1. Built by the community, for the community.</p>
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
     <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
   </footer>
 
