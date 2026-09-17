@@ -1312,3 +1312,149 @@ header {
 @media (max-width: 500px) {
   .punk-custom-row { flex-wrap: wrap; }
 }
+
+/* ===== Coming Soon page — polished ===== */
+.soon-page {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 90px 20px 100px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.soon-glow {
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 360px;
+  background: radial-gradient(ellipse, rgba(62,201,242,0.15), transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.soon-page > * { position: relative; z-index: 1; }
+
+.soon-icon {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 28px;
+  color: var(--cyan);
+}
+
+.soon-icon svg { width: 100%; height: 100%; }
+
+.soon-ring-outer {
+  fill: rgba(62, 201, 242, 0.05);
+  stroke: rgba(62, 201, 242, 0.25);
+  stroke-width: 1.5;
+}
+
+.soon-ring-dash {
+  fill: none;
+  stroke: rgba(62, 201, 242, 0.5);
+  stroke-width: 2;
+  stroke-dasharray: 3 8;
+  transform-origin: 50px 50px;
+  animation: soon-spin 20s linear infinite;
+}
+
+@keyframes soon-spin { to { transform: rotate(360deg); } }
+
+.soon-chart-line {
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(62,201,242,0.6));
+}
+
+.soon-dot {
+  fill: var(--cyan);
+  filter: drop-shadow(0 0 4px rgba(62,201,242,0.8));
+}
+
+.soon-headline { font-size: 2.4rem; margin-bottom: 14px; }
+.soon-subcopy { margin: 0 auto 44px; max-width: 460px; }
+
+.soon-timeline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.soon-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  position: relative;
+}
+
+.soon-step::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--line);
+  z-index: -1;
+}
+
+.soon-step:first-child::before { display: none; }
+
+.soon-step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+}
+
+.soon-step.done .soon-step-dot {
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+
+.soon-step.done::before { background: var(--cyan); }
+
+.soon-step.active .soon-step-dot {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 4px rgba(62, 201, 242, 0.15);
+  animation: soon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes soon-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(62, 201, 242, 0.15); }
+  50% { box-shadow: 0 0 0 7px rgba(62, 201, 242, 0.08); }
+}
+
+.soon-step-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 90px;
+}
+
+.soon-step.done .soon-step-label,
+.soon-step.active .soon-step-label {
+  color: var(--text);
+}
+
+.soon-footer-note {
+  color: var(--text-dimmer);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 500px) {
+  .soon-headline { font-size: 1.9rem; }
+  .soon-step-label { font-size: 0.62rem; max-width: 70px; }
+}
