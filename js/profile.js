@@ -1,4 +1,5 @@
 ﻿const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const READ_RPC_URL = "https://rpc.arc-scan.org";
 
 const CONTRACT_ABI = [
   "function ownerOf(uint256 tokenId) view returns (address)",
@@ -26,7 +27,7 @@ async function getTransferEventsChunked(contract, filter, provider) {
       console.warn("Chunk echoue, on continue:", err.message);
     }
     fromBlock = toBlock + 1;
-    await sleep(80);
+    await sleep(120);
   }
 
   return allEvents;
@@ -39,19 +40,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("profileConnectBtn");
 
   async function loadOwnedPunks() {
-    if (!walletState.connected || !walletState.provider) return;
+    if (!walletState.connected) return;
 
     if (emptyState) emptyState.style.display = "none";
     if (loading) loading.style.display = "block";
     grid.innerHTML = "";
 
     try {
-      const provider = new ethers.BrowserProvider(walletState.provider);
-      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+      const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
       const userAddress = walletState.address;
 
       const receivedFilter = contract.filters.Transfer(null, userAddress);
-      const receivedEvents = await getTransferEventsChunked(contract, receivedFilter, provider);
+      const receivedEvents = await getTransferEventsChunked(contract, receivedFilter, readProvider);
       const candidateIds = new Set(receivedEvents.map(e => e.args.tokenId.toString()));
 
       const checks = await Promise.all(
@@ -70,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loading.style.display = "none";
 
       if (ownedIds.length === 0) {
-        grid.innerHTML = "<p class=\"profile-none\">You don't own any ArcPunks yet (or search range too small). Check the <a href=\"https://opensea.io/collection/arc-punks-651893301\" target=\"_blank\">marketplace</a>.</p>";
+        grid.innerHTML = "<p class=\"profile-none\">You don't own any ArcPunks yet. Check the <a href=\"https://opensea.io/collection/arc-punks-651893301\" target=\"_blank\">marketplace</a>.</p>";
         return;
       }
 
