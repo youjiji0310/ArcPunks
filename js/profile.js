@@ -1,11 +1,12 @@
-const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+﻿const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 
 const CONTRACT_ABI = [
   "function ownerOf(uint256 tokenId) view returns (address)",
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
-const CHUNK_SIZE = 90000;
+const CHUNK_SIZE = 45000;
+const SEARCH_RANGE = 400000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,25 +14,19 @@ function sleep(ms) {
 
 async function getTransferEventsChunked(contract, filter, provider) {
   const currentBlock = await provider.getBlockNumber();
-  let fromBlock = Math.max(0, currentBlock - 2000000);
+  let fromBlock = Math.max(0, currentBlock - SEARCH_RANGE);
   let allEvents = [];
 
   while (fromBlock <= currentBlock) {
     const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);
-    let attempt = 0;
-    let success = false;
-    while (attempt < 3 && !success) {
-      try {
-        const events = await contract.queryFilter(filter, fromBlock, toBlock);
-        allEvents = allEvents.concat(events);
-        success = true;
-      } catch (err) {
-        attempt++;
-        if (attempt < 3) await sleep(800 * attempt);
-      }
+    try {
+      const events = await contract.queryFilter(filter, fromBlock, toBlock);
+      allEvents = allEvents.concat(events);
+    } catch (err) {
+      console.warn("Chunk echoue, on continue:", err.message);
     }
-    await sleep(150);
     fromBlock = toBlock + 1;
+    await sleep(80);
   }
 
   return allEvents;
@@ -75,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loading.style.display = "none";
 
       if (ownedIds.length === 0) {
-        grid.innerHTML = "<p class=\"profile-none\">You don't own any ArcPunks yet. Check the <a href=\"https://opensea.io/collection/arc-punks-651893301\" target=\"_blank\">marketplace</a>.</p>";
+        grid.innerHTML = "<p class=\"profile-none\">You don't own any ArcPunks yet (or search range too small). Check the <a href=\"https://opensea.io/collection/arc-punks-651893301\" target=\"_blank\">marketplace</a>.</p>";
         return;
       }
 
