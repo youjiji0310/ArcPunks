@@ -1031,3 +1031,41 @@ header {
 .wallet-modal-cancel:hover {
   border-color: rgba(255,255,255,0.2);
 }
+
+/* ===== Account modal + row entrance animation ===== */
+.wallet-account-address {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--cyan);
+  text-align: center;
+  padding: 16px 0;
+  margin-bottom: 14px;
+  background: var(--panel-2);
+  border-radius: 12px;
+  border: 1px solid rgba(62, 201, 242, 0.2);
+}
+
+.wallet-disconnect-row .wallet-modal-label {
+  color: #ff6b6b;
+}
+
+.wallet-disconnect-row:hover {
+  border-color: rgba(255, 107, 107, 0.4) !important;
+  background: rgba(255, 107, 107, 0.05) !important;
+}
+
+.wallet-modal-row {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: wallet-row-in 0.3s ease forwards;
+}
+
+.wallet-modal-row:nth-child(1) { animation-delay: 0.05s; }
+.wallet-modal-row:nth-child(2) { animation-delay: 0.1s; }
+.wallet-modal-row:nth-child(3) { animation-delay: 0.15s; }
+.wallet-modal-row:nth-child(4) { animation-delay: 0.2s; }
+.wallet-modal-row:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes wallet-row-in {
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,4 +1,4 @@
-﻿const ARC_TESTNET = {
+const ARC_TESTNET = {
   chainId: "0x4CEF52",
   chainName: "Arc Testnet",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
@@ -164,7 +164,7 @@ function openWalletModal() {
           closeWalletModal();
           window.dispatchEvent(new Event("arcpunks:walletReady"));
         } else {
-          status.textContent = "Failed — retry";
+          status.textContent = "Failed � retry";
         }
       } else if (w.installUrl) {
         window.open(w.installUrl, "_blank", "noopener,noreferrer");
@@ -179,6 +179,52 @@ function openWalletModal() {
   const closeBtn = document.createElement("button");
   closeBtn.className = "wallet-modal-cancel";
   closeBtn.textContent = "Cancel";
+  closeBtn.addEventListener("click", closeWalletModal);
+  panel.appendChild(closeBtn);
+
+  overlay.appendChild(panel);
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeWalletModal(); });
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => overlay.classList.add("visible"));
+}
+
+function openAccountModal() {
+  closeWalletModal();
+
+  const overlay = document.createElement("div");
+  overlay.id = "walletModalOverlay";
+  overlay.className = "wallet-modal-overlay";
+
+  const panel = document.createElement("div");
+  panel.className = "wallet-modal-panel";
+
+  panel.innerHTML =
+    "<div class=\"wallet-modal-header\"><span>Wallet Connected</span></div>" +
+    "<div class=\"wallet-account-address\">" + shortenAddress(walletState.address) + "</div>";
+
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "wallet-modal-row";
+  copyBtn.innerHTML = "<span class=\"wallet-modal-label\">Copy Address</span>";
+  copyBtn.addEventListener("click", () => {
+    navigator.clipboard.writeText(walletState.address);
+    copyBtn.querySelector(".wallet-modal-label").textContent = "Copied!";
+    setTimeout(() => { copyBtn.querySelector(".wallet-modal-label").textContent = "Copy Address"; }, 1500);
+  });
+  panel.appendChild(copyBtn);
+
+  const disconnectBtn = document.createElement("button");
+  disconnectBtn.className = "wallet-modal-row wallet-disconnect-row";
+  disconnectBtn.innerHTML = "<span class=\"wallet-modal-label\">Disconnect</span>";
+  disconnectBtn.addEventListener("click", () => {
+    disconnectWallet();
+    closeWalletModal();
+  });
+  panel.appendChild(disconnectBtn);
+
+  const closeBtn = document.createElement("button");
+  closeBtn.className = "wallet-modal-cancel";
+  closeBtn.textContent = "Close";
   closeBtn.addEventListener("click", closeWalletModal);
   panel.appendChild(closeBtn);
 
@@ -208,7 +254,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const buttons = [document.getElementById("navWalletBtn"), document.getElementById("mintWalletBtn")].filter(Boolean);
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (walletState.connected) return;
+      if (walletState.connected) {
+        openAccountModal();
+        return;
+      }
       openWalletModal();
     });
   });
