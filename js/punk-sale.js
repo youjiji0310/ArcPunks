@@ -1,5 +1,6 @@
-const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
+﻿const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
 const SALE_CONTRACT_ADDRESS = "0x5581a479c2Cf5FC281f457A27687063805a3BE27";
+const READ_RPC_URL = "https://rpc.arc-scan.org";
 
 const SALE_ABI = [
   "function buy(uint256 amount) external payable",
@@ -10,12 +11,13 @@ const TOKEN_ABI = [
   "function balanceOf(address account) view returns (uint256)"
 ];
 
-let provider, signer, saleContract, tokenContract;
+let provider, signer, saleContract;
 let pricePer500Wei = ethers.parseEther("0.5");
+let selectedAmount = 0;
 
 async function refreshSaleStats() {
   try {
-    const readProvider = new ethers.JsonRpcProvider("https://rpc.arc-scan.org");
+    const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
     const readSale = new ethers.Contract(SALE_CONTRACT_ADDRESS, SALE_ABI, readProvider);
     const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
 
@@ -34,31 +36,41 @@ async function refreshSaleStats() {
   }
 }
 
-function updateCostDisplay() {
-  const amountInput = document.getElementById("buyAmount");
-  const costEl = document.getElementById("buyCost");
-  const amount = Number(amountInput.value);
-
-  if (!amount || amount <= 0) {
-    costEl.innerHTML = "Enter an amount to see the cost.";
-    return;
-  }
-
-  const cost = (amount * Number(ethers.formatEther(pricePer500Wei))) / 500;
-  costEl.innerHTML = "Total cost: <strong>" + cost.toFixed(4) + " USDC</strong> for " + amount.toLocaleString() + " $PUNK";
-}
-
 async function refreshMyBalance() {
   if (!walletState.connected) return;
   try {
-    const readProvider = new ethers.JsonRpcProvider("https://rpc.arc-scan.org");
+    const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
     const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
     const bal = await readToken.balanceOf(walletState.address);
-    document.getElementById("myBalanceCard").style.display = "flex";
     document.getElementById("statMyBalance").textContent = Number(ethers.formatEther(bal)).toLocaleString();
   } catch (err) {
     console.warn("Could not load balance:", err.message);
+    document.getElementById("statMyBalance").textContent = "0";
   }
+}
+
+function updateCostDisplay() {
+  const costEl = document.getElementById("buyCost");
+  const buyBtn = document.getElementById("buyBtn");
+
+  if (!selectedAmount) {
+    costEl.textContent = "Select an amount above.";
+    buyBtn.textContent = "Select an amount first";
+    buyBtn.disabled = true;
+    return;
+  }
+
+  const cost = (selectedAmount * Number(ethers.formatEther(pricePer500Wei))) / 500;
+  costEl.innerHTML = "Total cost: <strong>" + cost.toFixed(4) + " USDC</strong> for " + selectedAmount.toLocaleString() + " $PUNK";
+  buyBtn.textContent = "Mint " + selectedAmount.toLocaleString() + " $PUNK";
+  buyBtn.disabled = !walletState.connected;
+}
+
+function selectAmount(amount, btnEl) {
+  selectedAmount = amount;
+  document.querySelectorAll(".punk-amount-btn").forEach((b) => b.classList.remove("selected"));
+  if (btnEl) btnEl.classList.add("selected");
+  updateCostDisplay();
 }
 
 async function connectAndShowBuy() {
@@ -68,35 +80,32 @@ async function connectAndShowBuy() {
   signer = await provider.getSigner();
   saleContract = new ethers.Contract(SALE_CONTRACT_ADDRESS, SALE_ABI, signer);
 
-  document.getElementById("connectBuyBtn").style.display = "none";
+  document.getElementById("connectPrompt").style.display = "none";
   document.getElementById("buyBtn").style.display = "block";
 
+  updateCostDisplay();
   await refreshMyBalance();
 }
 
 async function doBuy() {
   const buyBtn = document.getElementById("buyBtn");
   const statusEl = document.getElementById("buyStatus");
-  const amount = Number(document.getElementById("buyAmount").value);
 
-  if (!amount || amount <= 0) {
-    statusEl.textContent = "Enter a valid amount first.";
-    statusEl.className = "punk-buy-status error";
-    return;
-  }
+  if (!selectedAmount) return;
 
-  const cost = (BigInt(amount) * pricePer500Wei) / 500n;
+  const cost = (BigInt(selectedAmount) * pricePer500Wei) / 500n;
+  const originalText = buyBtn.textContent;
 
   try {
     buyBtn.disabled = true;
     buyBtn.textContent = "Confirm in wallet...";
     statusEl.textContent = "";
 
-    const tx = await saleContract.buy(amount, { value: cost, gasLimit: 300000 });
+    const tx = await saleContract.buy(selectedAmount, { value: cost, gasLimit: 300000 });
     buyBtn.textContent = "Processing...";
     await tx.wait();
 
-    statusEl.textContent = "Success! " + amount.toLocaleString() + " $PUNK sent to your wallet.";
+    statusEl.textContent = "Success! " + selectedAmount.toLocaleString() + " $PUNK sent to your wallet.";
     statusEl.className = "punk-buy-status success";
     await refreshSaleStats();
     await refreshMyBalance();
@@ -107,17 +116,18 @@ async function doBuy() {
   }
 
   buyBtn.disabled = false;
-  buyBtn.textContent = "Mint $PUNK";
+  buyBtn.textContent = originalText;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   refreshSaleStats();
 
+  document.querySelectorAll(".punk-amount-btn").forEach((btn) => {
+    btn.addEventListener("click", () => selectAmount(Number(btn.dataset.amount), btn));
+  });
+
   const connectBtn = document.getElementById("connectBuyBtn");
   const buyBtn = document.getElementById("buyBtn");
-  const amountInput = document.getElementById("buyAmount");
-
-  amountInput.addEventListener("input", updateCostDisplay);
 
   connectBtn.addEventListener("click", async () => {
     if (walletState.connected) {
@@ -125,11 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const navBtn = document.getElementById("navWalletBtn");
-    if (navBtn) {
-      navBtn.click();
-    } else if (typeof openWalletModal === "function") {
-      openWalletModal();
-    }
+    if (navBtn) navBtn.click();
     setTimeout(connectAndShowBuy, 1500);
   });
 

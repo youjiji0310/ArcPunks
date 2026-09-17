@@ -1234,3 +1234,45 @@ header {
   .punk-stats-row { grid-template-columns: 1fr; }
   .punk-split { grid-template-columns: 1fr; }
 }
+
+/* ===== Punk amount buttons ===== */
+.punk-buy-intro {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.punk-amount-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.punk-amount-btn {
+  padding: 12px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.punk-amount-btn:hover {
+  border-color: rgba(62, 201, 242, 0.4);
+}
+
+.punk-amount-btn.selected {
+  border-color: var(--cyan);
+  background: rgba(62, 201, 242, 0.12);
+  color: var(--cyan);
+}
+
+@media (max-width: 500px) {
+  .punk-amount-grid { grid-template-columns: repeat(3, 1fr); }
+}
