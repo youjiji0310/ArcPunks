@@ -1,4 +1,4 @@
-﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const PUNK_TOKEN_ADDRESS = "0xfbc2c897049E0316d93C7e5dda7951B3F239D5BF";
 const STAKING_CONTRACT_ADDRESS = "0xc533042F1E29f084231B0b5BFFBf9553ae05acD9";
 
@@ -31,6 +31,10 @@ let walletTokenIds = [];
 let liveRewards = {};
 let dailyRate = 0.25;
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function getEventsChunked(contract, filter, provider) {
   const currentBlock = await provider.getBlockNumber();
   const CHUNK_SIZE = 90000;
@@ -38,12 +42,19 @@ async function getEventsChunked(contract, filter, provider) {
   let allEvents = [];
   while (fromBlock <= currentBlock) {
     const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);
-    try {
-      const events = await contract.queryFilter(filter, fromBlock, toBlock);
-      allEvents = allEvents.concat(events);
-    } catch (err) {
-      console.warn("Erreur sur un range de blocs:", err.message);
+    let attempt = 0;
+    let success = false;
+    while (attempt < 3 && !success) {
+      try {
+        const events = await contract.queryFilter(filter, fromBlock, toBlock);
+        allEvents = allEvents.concat(events);
+        success = true;
+      } catch (err) {
+        attempt++;
+        if (attempt < 3) await sleep(800 * attempt);
+      }
     }
+    await sleep(150);
     fromBlock = toBlock + 1;
   }
   return allEvents;

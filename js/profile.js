@@ -1,4 +1,4 @@
-﻿const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 
 const CONTRACT_ABI = [
   "function ownerOf(uint256 tokenId) view returns (address)",
@@ -7,6 +7,10 @@ const CONTRACT_ABI = [
 
 const CHUNK_SIZE = 90000;
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function getTransferEventsChunked(contract, filter, provider) {
   const currentBlock = await provider.getBlockNumber();
   let fromBlock = 0;
@@ -14,12 +18,19 @@ async function getTransferEventsChunked(contract, filter, provider) {
 
   while (fromBlock <= currentBlock) {
     const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);
-    try {
-      const events = await contract.queryFilter(filter, fromBlock, toBlock);
-      allEvents = allEvents.concat(events);
-    } catch (err) {
-      console.warn(`Erreur sur le range ${fromBlock}-${toBlock}:`, err.message);
+    let attempt = 0;
+    let success = false;
+    while (attempt < 3 && !success) {
+      try {
+        const events = await contract.queryFilter(filter, fromBlock, toBlock);
+        allEvents = allEvents.concat(events);
+        success = true;
+      } catch (err) {
+        attempt++;
+        if (attempt < 3) await sleep(800 * attempt);
+      }
     }
+    await sleep(150);
     fromBlock = toBlock + 1;
   }
 
