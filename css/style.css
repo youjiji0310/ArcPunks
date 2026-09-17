@@ -1069,3 +1069,168 @@ header {
 @keyframes wallet-row-in {
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== $PUNK Token page — site theme ===== */
+.punk-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+  text-align: center;
+}
+
+.punk-headline { font-size: 2.4rem; line-height: 1.2; margin-bottom: 16px; }
+.punk-subcopy { margin: 0 auto 40px; max-width: 520px; }
+
+.punk-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.punk-stat-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.punk-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: var(--text);
+}
+
+.punk-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.punk-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+  text-align: left;
+}
+
+.punk-alloc {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.punk-alloc-pct {
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.punk-alloc-accent .punk-alloc-pct { color: var(--cyan); }
+
+.punk-alloc h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.punk-alloc p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.punk-bar {
+  height: 4px;
+  background: var(--panel-2);
+  border-radius: 4px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.punk-bar-fill {
+  height: 100%;
+  background: var(--text-dim);
+}
+
+.punk-bar-fill.accent { background: var(--cyan); }
+
+.punk-buy-card {
+  background: var(--panel);
+  border: 1px solid rgba(62, 201, 242, 0.25);
+  border-radius: 18px;
+  padding: 32px;
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.punk-buy-card h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.punk-buy-row input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  margin-bottom: 14px;
+}
+
+.punk-buy-cost {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.punk-buy-cost strong { color: var(--cyan); }
+
+.punk-buy-status {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  min-height: 20px;
+}
+
+.punk-buy-status.success { color: var(--cyan); }
+.punk-buy-status.error { color: #ff6b6b; }
+
+.punk-buy-sold {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dimmer);
+  margin-top: 10px;
+}
+
+.punk-note {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  max-width: 560px;
+  margin: 0 auto 8px;
+  line-height: 1.6;
+}
+
+.punk-note strong { color: var(--text); }
+
+@media (max-width: 700px) {
+  .punk-stats-row { grid-template-columns: 1fr; }
+  .punk-split { grid-template-columns: 1fr; }
+}

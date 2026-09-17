@@ -1,4 +1,4 @@
-﻿const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
+const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
 const SALE_CONTRACT_ADDRESS = "0x5581a479c2Cf5FC281f457A27687063805a3BE27";
 
 const SALE_ABI = [
@@ -66,7 +66,7 @@ async function doBuy() {
 
   if (!amount || amount <= 0) {
     statusEl.textContent = "Enter a valid amount first.";
-    statusEl.className = "buy-status error";
+    statusEl.className = "punk-buy-status error";
     return;
   }
 
@@ -82,12 +82,12 @@ async function doBuy() {
     await tx.wait();
 
     statusEl.textContent = "Success! " + amount.toLocaleString() + " $PUNK sent to your wallet.";
-    statusEl.className = "buy-status success";
+    statusEl.className = "punk-buy-status success";
     await refreshSaleStats();
   } catch (err) {
     console.error(err);
     statusEl.textContent = "Purchase failed: " + (err.reason || err.message);
-    statusEl.className = "buy-status error";
+    statusEl.className = "punk-buy-status error";
   }
 
   buyBtn.disabled = false;
