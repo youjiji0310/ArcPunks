@@ -1,14 +1,10 @@
-const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
-const PUNK_TOKEN_ADDRESS = "0x3980594AF0E0A27436B3bAB04235E65131b26d94";
-const STAKING_CONTRACT_ADDRESS = "0x86e233f0c3786C2612759b7d51a72c206FF4cb4C";
-const RPC_URL = "https://rpc.arc-scan.org";
+﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const PUNK_TOKEN_ADDRESS = "0xfbc2c897049E0316d93C7e5dda7951B3F239D5BF";
+const STAKING_CONTRACT_ADDRESS = "0xc533042F1E29f084231B0b5BFFBf9553ae05acD9";
 
 const NFT_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
   "function ownerOf(uint256 tokenId) view returns (address)",
-  "function isApprovedForAll(address owner, address operator) view returns (bool)",
-  "function setApprovalForAll(address operator, bool approved) external",
-  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)"
+  "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
 const PUNK_ABI = [
@@ -22,6 +18,7 @@ const STAKING_ABI = [
   "function pendingReward(uint256 tokenId) view returns (uint256)",
   "function stakedSince(uint256 tokenId) view returns (uint256)",
   "function canUnstake(uint256 tokenId) view returns (bool)",
+  "function isCurrentlyStaked(uint256 tokenId) view returns (bool)",
   "function dailyRatePerNFT() view returns (uint256)",
   "event Staked(address indexed user, uint256 tokenId)",
   "event Unstaked(address indexed user, uint256 tokenId)"
@@ -33,10 +30,6 @@ let stakedTokenIds = [];
 let walletTokenIds = [];
 let liveRewards = {};
 let dailyRate = 0.25;
-
-function shorten(addr) {
-  return addr.slice(0, 6) + "..." + addr.slice(-4);
-}
 
 async function initStaking() {
   if (!walletState.connected || !walletState.provider) return;
@@ -50,17 +43,20 @@ async function initStaking() {
   stakingContract = new ethers.Contract(STAKING_CONTRACT_ADDRESS, STAKING_ABI, signer);
 
   document.getElementById("stakingConnectPrompt").style.display = "none";
+  document.getElementById("stakingApprovalPrompt").style.display = "none";
+  document.getElementById("stakingContent").style.display = "block";
 
   try {
     const rate = await stakingContract.dailyRatePerNFT();
     dailyRate = Number(ethers.formatEther(rate));
-    document.getElementById("statRate").textContent = dailyRate;
+    const rateEl = document.getElementById("statRate");
+    if (rateEl) rateEl.textContent = dailyRate;
   } catch (err) {
     console.warn("Could not read rate:", err.message);
   }
 
   await refreshBalance();
-  await checkApproval();
+  await loadEverything();
 }
 
 async function refreshBalance() {
@@ -69,21 +65,6 @@ async function refreshBalance() {
     document.getElementById("statBalance").textContent = Number(ethers.formatEther(bal)).toFixed(4);
   } catch (err) {
     console.warn("Balance read error:", err.message);
-  }
-}
-
-async function checkApproval() {
-  try {
-    const approved = await nftContract.isApprovedForAll(userAddress, STAKING_CONTRACT_ADDRESS);
-    if (approved) {
-      document.getElementById("stakingApprovalPrompt").style.display = "none";
-      document.getElementById("stakingContent").style.display = "block";
-      await loadEverything();
-    } else {
-      document.getElementById("stakingApprovalPrompt").style.display = "block";
-    }
-  } catch (err) {
-    console.error("Approval check error:", err);
   }
 }
 
@@ -106,7 +87,13 @@ async function loadStakedTokens() {
     const stakedIds = new Set(stakedEvents.map(e => e.args.tokenId.toString()));
     unstakedEvents.forEach(e => stakedIds.delete(e.args.tokenId.toString()));
 
-    stakedTokenIds = Array.from(stakedIds);
+    stakedTokenIds = [];
+    for (const id of stakedIds) {
+      try {
+        const stillStaked = await stakingContract.isCurrentlyStaked(id);
+        if (stillStaked) stakedTokenIds.push(id);
+      } catch (err) {}
+    }
   } catch (err) {
     console.error("Error loading staked tokens:", err);
     stakedTokenIds = [];
@@ -116,18 +103,27 @@ async function loadStakedTokens() {
 async function loadWalletTokens() {
   walletTokenIds = [];
   try {
-    const balance = await nftContract.balanceOf(userAddress);
-    const count = Number(balance);
-    for (let i = 0; i < count; i++) {
-      try {
-        const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
-        walletTokenIds.push(tokenId.toString());
-      } catch (err) {
-        break;
-      }
-    }
+    const receivedFilter = nftContract.filters.Transfer(null, userAddress);
+    const receivedEvents = await nftContract.queryFilter(receivedFilter, 0, "latest");
+
+    const candidateIds = new Set(receivedEvents.map(e => e.args.tokenId.toString()));
+
+    const checks = await Promise.all(
+      Array.from(candidateIds).map(async (tokenId) => {
+        if (stakedTokenIds.includes(tokenId)) return null;
+        try {
+          const currentOwner = await nftContract.ownerOf(tokenId);
+          return currentOwner.toLowerCase() === userAddress.toLowerCase() ? tokenId : null;
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    walletTokenIds = checks.filter(id => id !== null);
   } catch (err) {
-    console.warn("Enumeration not available, use manual stake input.");
+    console.error("Error loading wallet tokens:", err);
+    walletTokenIds = [];
   }
 }
 
@@ -135,9 +131,10 @@ function renderStakedGrid() {
   const grid = document.getElementById("stakedGrid");
   const emptyMsg = document.getElementById("stakedEmptyMsg");
   const countLabel = document.getElementById("stakedCountLabel");
+  const statStakedCount = document.getElementById("statStakedCount");
 
   countLabel.textContent = `(${stakedTokenIds.length})`;
-  document.getElementById("statStakedCount").textContent = stakedTokenIds.length;
+  if (statStakedCount) statStakedCount.textContent = stakedTokenIds.length;
   grid.innerHTML = "";
 
   if (stakedTokenIds.length === 0) {
@@ -152,7 +149,6 @@ function renderStakedGrid() {
     card.innerHTML = `
       <div class="staking-card-header">
         <span class="staking-card-id">ArcPunk #${tokenId}</span>
-        <span class="staking-gear spin">?</span>
       </div>
       <div class="staking-reward-display">
         <span class="staking-reward-value" id="reward-${tokenId}">0.0000</span>
@@ -172,9 +168,11 @@ function renderStakedGrid() {
 }
 
 function renderWalletGrid() {
-  document.getElementById("statWalletCount").textContent = walletTokenIds.length;
   const grid = document.getElementById("walletGrid");
   const emptyMsg = document.getElementById("walletEmptyMsg");
+  const statWalletCount = document.getElementById("statWalletCount");
+
+  if (statWalletCount) statWalletCount.textContent = walletTokenIds.length;
   grid.innerHTML = "";
 
   if (walletTokenIds.length === 0) {
@@ -264,7 +262,7 @@ async function updateLockStatuses() {
       const can = await stakingContract.canUnstake(tokenId);
       const el = document.getElementById(`lock-${tokenId}`);
       if (el) {
-        el.textContent = can ? "? Unlocked" : "?? Locked (7-day minimum)";
+        el.textContent = can ? "✓ Unlocked" : "🔒 Locked (7-day minimum)";
         el.className = "staking-lock-status " + (can ? "unlocked" : "locked");
       }
     } catch (err) {}
@@ -282,7 +280,6 @@ function tickLiveRewards() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("stakingConnectBtn");
-  const approveBtn = document.getElementById("approveBtn");
   const manualBtn = document.getElementById("manualStakeBtn");
 
   if (connectBtn) {
@@ -290,25 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const navBtn = document.getElementById("navWalletBtn");
       if (navBtn) navBtn.click();
       setTimeout(initStaking, 1500);
-    });
-  }
-
-  if (approveBtn) {
-    approveBtn.addEventListener("click", async () => {
-      try {
-        approveBtn.disabled = true;
-        approveBtn.textContent = "Approving...";
-        const tx = await nftContract.setApprovalForAll(STAKING_CONTRACT_ADDRESS, true);
-        await tx.wait();
-        document.getElementById("stakingApprovalPrompt").style.display = "none";
-        document.getElementById("stakingContent").style.display = "block";
-        await loadEverything();
-      } catch (err) {
-        console.error(err);
-        alert("Approval failed: " + (err.reason || err.message));
-        approveBtn.disabled = false;
-        approveBtn.textContent = "Approve Vault";
-      }
     });
   }
 
