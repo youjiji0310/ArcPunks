@@ -38,7 +38,7 @@ function sleep(ms) {
 async function getEventsChunked(contract, filter, provider) {
   const currentBlock = await provider.getBlockNumber();
   const CHUNK_SIZE = 90000;
-  let fromBlock = 0;
+  let fromBlock = Math.max(0, currentBlock - 2000000);
   let allEvents = [];
   while (fromBlock <= currentBlock) {
     const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);

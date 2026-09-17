@@ -13,7 +13,7 @@ function sleep(ms) {
 
 async function getTransferEventsChunked(contract, filter, provider) {
   const currentBlock = await provider.getBlockNumber();
-  let fromBlock = 0;
+  let fromBlock = Math.max(0, currentBlock - 2000000);
   let allEvents = [];
 
   while (fromBlock <= currentBlock) {
