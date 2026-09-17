@@ -1,6 +1,10 @@
 ﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const PUNK_TOKEN_ADDRESS = "0xfbc2c897049E0316d93C7e5dda7951B3F239D5BF";
 const STAKING_CONTRACT_ADDRESS = "0xc533042F1E29f084231B0b5BFFBf9553ae05acD9";
+const READ_RPC_URL = "https://rpc.arc-scan.org";
+const MAX_SUPPLY = 10000;
+const SCAN_BATCH = 25;
+const SCAN_DELAY = 130;
 
 const NFT_ABI = ["function ownerOf(uint256 tokenId) view returns (address)"];
 const PUNK_ABI = ["function balanceOf(address account) view returns (uint256)"];
@@ -16,42 +20,28 @@ const STAKING_ABI = [
 
 let provider, signer, userAddress;
 let nftContract, punkContract, stakingContract;
-let trackedTokenIds = [];
+let walletTokenIds = [];
+let stakedTokenIds = [];
+let selectedIds = new Set();
 let liveRewards = {};
 let dailyRate = 0.25;
 
-function storageKey() {
-  return "arcpunks_staked_" + userAddress.toLowerCase();
-}
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
-function loadTrackedIds() {
-  try {
-    const raw = localStorage.getItem(storageKey());
-    trackedTokenIds = raw ? JSON.parse(raw) : [];
-  } catch {
-    trackedTokenIds = [];
-  }
-}
+function stakedKey() { return "arcpunks_staked_" + userAddress.toLowerCase(); }
+function walletKey() { return "arcpunks_wallet_" + userAddress.toLowerCase(); }
 
-function saveTrackedIds() {
-  try {
-    localStorage.setItem(storageKey(), JSON.stringify(trackedTokenIds));
-  } catch {}
+function loadStakedIds() {
+  try { stakedTokenIds = [...new Set(JSON.parse(localStorage.getItem(stakedKey()) || "[]"))]; }
+  catch { stakedTokenIds = []; }
 }
+function saveStakedIds() { localStorage.setItem(stakedKey(), JSON.stringify(stakedTokenIds)); }
 
-function addTrackedId(tokenId) {
-  const id = tokenId.toString();
-  if (!trackedTokenIds.includes(id)) {
-    trackedTokenIds.push(id);
-    saveTrackedIds();
-  }
+function loadWalletIds() {
+  try { walletTokenIds = [...new Set(JSON.parse(localStorage.getItem(walletKey()) || "[]"))]; }
+  catch { walletTokenIds = []; }
 }
-
-function removeTrackedId(tokenId) {
-  const id = tokenId.toString();
-  trackedTokenIds = trackedTokenIds.filter((t) => t !== id);
-  saveTrackedIds();
-}
+function saveWalletIds() { localStorage.setItem(walletKey(), JSON.stringify(walletTokenIds)); }
 
 async function initStaking() {
   if (!walletState.connected || !walletState.provider) return;
@@ -70,117 +60,157 @@ async function initStaking() {
   try {
     const rate = await stakingContract.dailyRatePerNFT();
     dailyRate = Number(ethers.formatEther(rate));
-    const rateEl = document.getElementById("statRate");
-    if (rateEl) rateEl.textContent = dailyRate;
-  } catch (err) {}
+  } catch {}
 
-  loadTrackedIds();
+  loadStakedIds();
+  loadWalletIds();
   await refreshBalance();
-  await refreshDashboard();
+  await refreshStakedGrid();
+  renderWalletGrid();
+  updatePointsPerDay();
+  scanWalletInBackground();
 }
 
 async function refreshBalance() {
   try {
     const bal = await punkContract.balanceOf(userAddress);
     document.getElementById("statBalance").textContent = Number(ethers.formatEther(bal)).toFixed(4);
-  } catch (err) {}
+  } catch {}
 }
 
-async function refreshDashboard() {
+function updatePointsPerDay() {
+  const el = document.getElementById("statPointsPerDay");
+  if (el) el.textContent = (stakedTokenIds.length * dailyRate).toFixed(2);
+}
+
+async function refreshStakedGrid() {
   const grid = document.getElementById("stakedGrid");
   const emptyMsg = document.getElementById("stakedEmptyMsg");
   const countLabel = document.getElementById("stakedCountLabel");
   const statStakedCount = document.getElementById("statStakedCount");
 
   const stillValid = [];
-
-  for (const tokenId of trackedTokenIds) {
+  for (const id of stakedTokenIds) {
     try {
-      const staked = await stakingContract.isCurrentlyStaked(tokenId);
-      if (staked) stillValid.push(tokenId);
-      else removeTrackedId(tokenId);
-    } catch (err) {}
+      const staked = await stakingContract.isCurrentlyStaked(id);
+      if (staked) stillValid.push(id);
+    } catch {}
   }
-  trackedTokenIds = stillValid;
+  stakedTokenIds = stillValid;
+  saveStakedIds();
 
-  countLabel.textContent = "(" + trackedTokenIds.length + ")";
-  if (statStakedCount) statStakedCount.textContent = trackedTokenIds.length;
+  countLabel.textContent = "(" + stakedTokenIds.length + ")";
+  if (statStakedCount) statStakedCount.textContent = stakedTokenIds.length;
+  updatePointsPerDay();
+
   grid.innerHTML = "";
-
-  if (trackedTokenIds.length === 0) {
+  if (stakedTokenIds.length === 0) {
     emptyMsg.style.display = "block";
     return;
   }
   emptyMsg.style.display = "none";
 
-  for (const tokenId of trackedTokenIds) {
+  for (const id of stakedTokenIds) {
     const card = document.createElement("div");
-    card.className = "staking-card staked";
+    card.className = "soft-card";
     card.innerHTML =
-      "<div class=\"staking-card-header\"><span class=\"staking-card-id\">ArcPunk #" + tokenId + "</span></div>" +
-      "<div class=\"staking-reward-display\"><span class=\"staking-reward-value\" id=\"reward-" + tokenId + "\">0.0000</span><span class=\"staking-reward-unit\">$PUNK earned</span></div>" +
-      "<div class=\"staking-card-actions\"><button class=\"btn btn-outline staking-btn-sm\" data-claim=\"" + tokenId + "\">Claim</button><button class=\"btn btn-primary staking-btn-sm\" data-unstake=\"" + tokenId + "\">Unstake</button></div>" +
-      "<p class=\"staking-lock-status\" id=\"lock-" + tokenId + "\"></p>";
+      "<div class=\"soft-card-id\">#" + id + "</div>" +
+      "<div class=\"soft-card-reward\"><span id=\"reward-" + id + "\">0.0000</span> $PUNK</div>" +
+      "<div class=\"soft-card-actions\">" +
+      "<button class=\"btn btn-outline btn-sm\" data-claim=\"" + id + "\">Claim</button>" +
+      "<button class=\"btn btn-primary btn-sm\" data-unstake=\"" + id + "\">Unstake</button>" +
+      "</div>" +
+      "<p class=\"soft-lock\" id=\"lock-" + id + "\"></p>";
     grid.appendChild(card);
 
     try {
-      const reward = await stakingContract.pendingReward(tokenId);
-      liveRewards[tokenId] = Number(ethers.formatEther(reward));
-    } catch {
-      liveRewards[tokenId] = 0;
-    }
+      const reward = await stakingContract.pendingReward(id);
+      liveRewards[id] = Number(ethers.formatEther(reward));
+    } catch { liveRewards[id] = 0; }
 
     try {
-      const can = await stakingContract.canUnstake(tokenId);
-      const el = document.getElementById("lock-" + tokenId);
-      if (el) {
-        el.textContent = can ? "Unlocked" : "Locked (7-day minimum)";
-        el.className = "staking-lock-status " + (can ? "unlocked" : "locked");
+      const can = await stakingContract.canUnstake(id);
+      const lockEl = document.getElementById("lock-" + id);
+      if (lockEl) {
+        lockEl.textContent = can ? "Unlocked" : "Locked (7 days)";
+        lockEl.className = "soft-lock " + (can ? "unlocked" : "");
       }
     } catch {}
   }
 
-  attachStakedListeners();
+  document.querySelectorAll("[data-claim]").forEach((btn) => btn.addEventListener("click", () => doClaim(btn.dataset.claim, btn)));
+  document.querySelectorAll("[data-unstake]").forEach((btn) => btn.addEventListener("click", () => doUnstake(btn.dataset.unstake, btn)));
 }
 
-function attachStakedListeners() {
-  document.querySelectorAll("[data-claim]").forEach((btn) => {
-    btn.addEventListener("click", () => doClaim(btn.dataset.claim, btn));
-  });
-  document.querySelectorAll("[data-unstake]").forEach((btn) => {
-    btn.addEventListener("click", () => doUnstake(btn.dataset.unstake, btn));
+function renderWalletGrid() {
+  const grid = document.getElementById("walletGrid");
+  const emptyMsg = document.getElementById("walletEmptyMsg");
+  const countLabel = document.getElementById("walletCountLabel");
+
+  const available = walletTokenIds.filter((id) => !stakedTokenIds.includes(id));
+  countLabel.textContent = "(" + available.length + ")";
+  grid.innerHTML = "";
+
+  if (available.length === 0) {
+    emptyMsg.style.display = "block";
+    return;
+  }
+  emptyMsg.style.display = "none";
+
+  available.sort((a, b) => Number(a) - Number(b)).forEach((id) => {
+    const card = document.createElement("div");
+    card.className = "soft-card selectable" + (selectedIds.has(id) ? " selected" : "");
+    card.dataset.id = id;
+    card.innerHTML = "<div class=\"soft-card-id\">#" + id + "</div><div class=\"soft-check\">✓</div>";
+    card.addEventListener("click", () => {
+      if (selectedIds.has(id)) selectedIds.delete(id);
+      else selectedIds.add(id);
+      renderWalletGrid();
+    });
+    grid.appendChild(card);
   });
 }
 
-async function doStake(tokenId, btn) {
-  try {
-    btn.disabled = true;
-    btn.textContent = "Staking...";
+async function scanWalletInBackground() {
+  const statusEl = document.getElementById("scanStatus");
+  const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
+  const contract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, readProvider);
 
-    const alreadyStaked = await stakingContract.isCurrentlyStaked(tokenId);
-    if (alreadyStaked) {
-      addTrackedId(tokenId);
-      await refreshDashboard();
-      btn.disabled = false;
-      btn.textContent = "Stake";
-      alert("This punk is already staked!");
-      return;
+  for (let start = 1; start <= MAX_SUPPLY; start += SCAN_BATCH) {
+    const batch = [];
+    for (let id = start; id < start + SCAN_BATCH && id <= MAX_SUPPLY; id++) batch.push(id);
+
+    const results = await Promise.all(batch.map(async (id) => {
+      try {
+        const owner = await contract.ownerOf(id);
+        return owner.toLowerCase() === userAddress.toLowerCase() ? id.toString() : null;
+      } catch { return null; }
+    }));
+
+    const found = results.filter((r) => r !== null);
+    if (found.length > 0) {
+      walletTokenIds = [...new Set([...walletTokenIds, ...found])];
+      saveWalletIds();
+      renderWalletGrid();
     }
 
+    const pct = Math.round((Math.min(start + SCAN_BATCH - 1, MAX_SUPPLY) / MAX_SUPPLY) * 100);
+    if (statusEl) statusEl.textContent = "Scanning wallet... " + pct + "%";
+
+    await sleep(SCAN_DELAY);
+  }
+  if (statusEl) statusEl.textContent = "";
+}
+
+async function doStakeOne(tokenId) {
+  const alreadyStaked = await stakingContract.isCurrentlyStaked(tokenId);
+  if (!alreadyStaked) {
     const tx = await stakingContract.stake(tokenId, { gasLimit: 300000 });
     await tx.wait();
-
-    addTrackedId(tokenId);
-    await refreshDashboard();
-    await refreshBalance();
-
-    btn.disabled = false;
-    btn.textContent = "Stake";
-  } catch (err) {
-    console.error(err);
-    alert("Stake failed: " + (err.reason || err.message));
-    btn.disabled = false;
-    btn.textContent = "Stake";
+  }
+  if (!stakedTokenIds.includes(tokenId)) {
+    stakedTokenIds.push(tokenId);
+    saveStakedIds();
   }
 }
 
@@ -194,7 +224,6 @@ async function doClaim(tokenId, btn) {
     btn.disabled = false;
     btn.textContent = "Claim";
   } catch (err) {
-    console.error(err);
     alert("Claim failed: " + (err.reason || err.message));
     btn.disabled = false;
     btn.textContent = "Claim";
@@ -207,59 +236,90 @@ async function doUnstake(tokenId, btn) {
     btn.textContent = "Unstaking...";
     const tx = await stakingContract.unstake(tokenId, { gasLimit: 300000 });
     await tx.wait();
-    removeTrackedId(tokenId);
-    await refreshDashboard();
+    stakedTokenIds = stakedTokenIds.filter((t) => t !== tokenId);
+    saveStakedIds();
+    await refreshStakedGrid();
+    renderWalletGrid();
     await refreshBalance();
   } catch (err) {
-    console.error(err);
-    alert("Unstake failed (still locked?): " + (err.reason || err.message));
+    alert("Unstake failed: " + (err.reason || err.message));
     btn.disabled = false;
     btn.textContent = "Unstake";
   }
 }
 
 function tickLiveRewards() {
-  trackedTokenIds.forEach((tokenId) => {
-    if (!(tokenId in liveRewards)) liveRewards[tokenId] = 0;
-    liveRewards[tokenId] += dailyRate / (24 * 60 * 60);
-    const el = document.getElementById("reward-" + tokenId);
-    if (el) el.textContent = liveRewards[tokenId].toFixed(6);
+  stakedTokenIds.forEach((id) => {
+    if (!(id in liveRewards)) liveRewards[id] = 0;
+    liveRewards[id] += dailyRate / (24 * 60 * 60);
+    const el = document.getElementById("reward-" + id);
+    if (el) el.textContent = liveRewards[id].toFixed(6);
   });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const connectBtn = document.getElementById("stakingConnectBtn");
-  const manualBtn = document.getElementById("manualStakeBtn");
+  const manualBtn = document.getElementById("manualAddBtn");
+  const selectAllBtn = document.getElementById("selectAllBtn");
+  const stakeSelectedBtn = document.getElementById("stakeSelectedBtn");
 
   if (connectBtn) {
     connectBtn.addEventListener("click", () => {
-      const navBtn = document.getElementById("navWalletBtn");
-      if (navBtn) navBtn.click();
+      document.getElementById("navWalletBtn")?.click();
       setTimeout(initStaking, 1500);
     });
   }
 
   if (manualBtn) {
-    manualBtn.addEventListener("click", () => {
-      const tokenId = document.getElementById("manualTokenId").value.trim();
-      if (!tokenId) return;
-      doStake(tokenId, manualBtn);
+    manualBtn.addEventListener("click", async () => {
+      const id = document.getElementById("manualTokenId").value.trim();
+      if (!id) return;
+      try {
+        const owner = await nftContract.ownerOf(id);
+        if (owner.toLowerCase() === userAddress.toLowerCase()) {
+          walletTokenIds = [...new Set([...walletTokenIds, id])];
+          saveWalletIds();
+          renderWalletGrid();
+        } else {
+          alert("You don't own this token.");
+        }
+      } catch {
+        alert("Couldn't verify that token ID.");
+      }
     });
   }
 
-  setTimeout(() => {
-    if (walletState.connected) initStaking();
-  }, 800);
-
-  const navWalletBtn = document.getElementById("navWalletBtn");
-  if (navWalletBtn) {
-    navWalletBtn.addEventListener("click", () => {
-      setTimeout(initStaking, 1500);
+  if (selectAllBtn) {
+    selectAllBtn.addEventListener("click", () => {
+      const available = walletTokenIds.filter((id) => !stakedTokenIds.includes(id));
+      if (selectedIds.size === available.length) selectedIds.clear();
+      else available.forEach((id) => selectedIds.add(id));
+      renderWalletGrid();
     });
   }
+
+  if (stakeSelectedBtn) {
+    stakeSelectedBtn.addEventListener("click", async () => {
+      if (selectedIds.size === 0) { alert("Select at least one ArcPunk first."); return; }
+      stakeSelectedBtn.disabled = true;
+      stakeSelectedBtn.textContent = "Staking...";
+      for (const id of selectedIds) {
+        try { await doStakeOne(id); } catch (err) { console.error(err); }
+      }
+      selectedIds.clear();
+      await refreshStakedGrid();
+      renderWalletGrid();
+      await refreshBalance();
+      stakeSelectedBtn.disabled = false;
+      stakeSelectedBtn.textContent = "Stake selected";
+    });
+  }
+
+  setTimeout(() => { if (walletState.connected) initStaking(); }, 800);
+
+  document.getElementById("navWalletBtn")?.addEventListener("click", () => {
+    setTimeout(initStaking, 1500);
+  });
 
   setInterval(tickLiveRewards, 1000);
-  setInterval(() => {
-    if (stakingContract) refreshDashboard();
-  }, 30000);
 });

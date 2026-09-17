@@ -719,3 +719,216 @@ header {
   .roadmap-title { font-size: 2.2rem; }
   .roadmap-header { padding: 16px 20px; }
 }
+
+/* ===== Soft Stake — clean minimal design ===== */
+.soft-stake-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 70px 20px 100px;
+  text-align: center;
+}
+
+.soft-stake-title {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.soft-stake-subtitle {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+
+.soft-stake-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.soft-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.soft-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.soft-stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.soft-connect-prompt {
+  display: flex;
+  justify-content: center;
+  padding: 30px 0;
+}
+
+.soft-section {
+  margin-bottom: 50px;
+  text-align: left;
+}
+
+.soft-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.soft-section-header h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.soft-section-header h2 span {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.soft-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.soft-link-btn {
+  background: none;
+  border: none;
+  color: var(--cyan);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.soft-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.soft-card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.soft-card.selectable {
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.soft-card.selectable:hover {
+  border-color: rgba(62, 201, 242, 0.4);
+}
+
+.soft-card.selected {
+  border-color: var(--cyan);
+  background: rgba(62, 201, 242, 0.1);
+}
+
+.soft-card-id {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.soft-check {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  color: var(--cyan);
+  font-size: 0.8rem;
+  opacity: 0;
+}
+
+.soft-card.selected .soft-check {
+  opacity: 1;
+}
+
+.soft-card-reward {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--cyan);
+  margin: 8px 0;
+}
+
+.soft-card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.soft-card-actions .btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.72rem;
+  justify-content: center;
+}
+
+.soft-lock {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  margin-top: 8px;
+}
+
+.soft-lock.unlocked {
+  color: var(--cyan);
+}
+
+.soft-empty-msg {
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  padding: 16px 0;
+}
+
+.soft-manual-row {
+  display: flex;
+  gap: 10px;
+  max-width: 300px;
+  margin-top: 16px;
+}
+
+.soft-manual-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.soft-scan-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dimmer);
+  margin-top: 10px;
+}
