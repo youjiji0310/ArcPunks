@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>$PUNK Token — ArcPunks</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0d; --bg-raised:#131316; --line:#232327;
+    --ink:#f2f0eb; --ink-dim:#9a9a9f; --ember:#ff7a1a; --ember-dim:#7a3d12;
+    --font-display:'Space Grotesk', 'Segoe UI', sans-serif;
+    --font-body:-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font-body);
+    display:flex;flex-direction:column;align-items:center;line-height:1.5;}
+
+  .punk-header{width:100%;max-width:880px;padding:24px 20px;display:flex;
+    justify-content:space-between;align-items:center;}
+  .punk-header a{color:var(--ink-dim);text-decoration:none;font-size:14px;}
+  .punk-header a:hover{color:var(--ink);}
+  .punk-brand{color:var(--ink);font-weight:700;font-family:var(--font-display);}
+
+  section{max-width:880px;width:100%;padding:32px 20px 80px;}
+
+  .kicker{font-family:var(--font-display);font-size:14px;color:var(--ember);
+    letter-spacing:0.02em;margin-bottom:18px;}
+
+  h1{font-family:var(--font-display);font-weight:600;font-size:clamp(32px,5vw,52px);
+    line-height:1.08;letter-spacing:-0.01em;max-width:14ch;margin-bottom:20px;}
+  h1 span{color:var(--ember);}
+
+  .lede{color:var(--ink-dim);font-size:17px;max-width:56ch;margin-bottom:48px;}
+
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:2px;overflow:hidden;
+    margin-bottom:48px;}
+  .stat{background:var(--bg-raised);padding:28px 24px;}
+  .stat-value{font-family:var(--font-display);font-size:clamp(20px,3vw,28px);
+    font-weight:600;margin-bottom:6px;}
+  .stat-label{color:var(--ink-dim);font-size:13px;}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px;}
+  @media (max-width:640px){.split{grid-template-columns:1fr;} .stat-row{grid-template-columns:1fr;}}
+
+  .alloc{border:1px solid var(--line);border-radius:2px;padding:28px;position:relative;
+    background:var(--bg-raised);}
+  .alloc-pct{font-family:var(--font-display);font-size:40px;font-weight:600;margin-bottom:8px;}
+  .alloc.airdrop .alloc-pct{color:var(--ink);}
+  .alloc.mint .alloc-pct{color:var(--ember);}
+  .alloc-title{font-size:15px;font-weight:600;margin-bottom:8px;}
+  .alloc-desc{color:var(--ink-dim);font-size:14px;max-width:32ch;}
+  .bar{height:3px;background:var(--line);border-radius:2px;margin-top:20px;overflow:hidden;}
+  .bar-fill{height:100%;background:var(--ink-dim);}
+  .alloc.mint .bar-fill{background:var(--ember);}
+
+  .mint-price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;
+    padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    margin-bottom:48px;}
+  .mint-price .price{font-family:var(--font-display);font-size:28px;font-weight:600;color:var(--ember);}
+  .mint-price .unit{color:var(--ink-dim);font-size:15px;}
+
+  .notes{color:var(--ink-dim);font-size:14px;max-width:56ch;margin-bottom:12px;}
+  .notes strong{color:var(--ink);font-weight:600;}
+
+  .buy-box{margin-top:40px;border:1px solid var(--line);border-radius:2px;
+    padding:28px;background:var(--bg-raised);}
+  .buy-box h3{font-family:var(--font-display);font-size:18px;margin-bottom:16px;}
+  .buy-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:14px;}
+  .buy-row input{flex:1;min-width:140px;padding:12px 14px;background:var(--bg);
+    border:1px solid var(--line);border-radius:2px;color:var(--ink);font-family:var(--font-body);
+    font-size:15px;}
+  .buy-row input:focus{outline:none;border-color:var(--ember);}
+  .buy-cost{color:var(--ink-dim);font-size:14px;margin-bottom:20px;}
+  .buy-cost strong{color:var(--ember);}
+  .buy-btn{width:100%;padding:14px;background:var(--ember);color:#0b0b0d;font-weight:600;
+    font-size:15px;border:none;border-radius:2px;cursor:pointer;font-family:var(--font-body);}
+  .buy-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .buy-status{margin-top:14px;font-size:14px;text-align:center;min-height:20px;}
+  .buy-status.success{color:#4ade80;}
+  .buy-status.error{color:#ff6b6b;}
+  .buy-sold{font-family:var(--font-mono),monospace;font-size:13px;color:var(--ink-dim);margin-top:10px;}
+</style>
+</head>
+<body>
+  <div class="punk-header">
+    <a href="/" class="punk-brand">ArcPunks</a>
+    <a href="/staking">← Back to Staking</a>
+  </div>
+
+  <section>
+    <div class="kicker">The next chapter</div>
+    <h1>The mint was only the beginning. <span>$PUNK</span> is here.</h1>
+    <p class="lede">An inscription-based token built for the ArcPunks ecosystem — for holders, stakers, and everyone who mints in.</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-value">10,000,000</div>
+        <div class="stat-label">Total $PUNK supply</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">$0.5</div>
+        <div class="stat-label">USDC per 500 $PUNK</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statSold">0</div>
+        <div class="stat-label">$PUNK sold so far</div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="alloc airdrop">
+        <div class="alloc-pct">30%</div>
+        <div class="alloc-title">Holder Airdrop</div>
+        <div class="alloc-desc">Reserved for ArcPunks holders. Distributed directly to the community that minted the collection.</div>
+        <div class="bar"><div class="bar-fill" style="width:30%"></div></div>
+      </div>
+      <div class="alloc mint">
+        <div class="alloc-pct">70%</div>
+        <div class="alloc-title">Public Mint</div>
+        <div class="alloc-desc">Open to everyone. The remaining supply, available through public mint.</div>
+        <div class="bar"><div class="bar-fill" style="width:70%"></div></div>
+      </div>
+    </div>
+
+    <div class="mint-price">
+      <span class="price">$0.5 USDC</span>
+      <span class="unit">/ every 500 $PUNK minted</span>
+    </div>
+
+    <div class="buy-box">
+      <h3>Mint $PUNK</h3>
+      <div class="buy-row">
+        <input type="number" id="buyAmount" placeholder="Amount of $PUNK (e.g. 500)" min="1" step="1">
+        <button class="buy-btn" id="connectBuyBtn" style="width:auto; white-space:nowrap;">Connect Wallet</button>
+      </div>
+      <div class="buy-cost" id="buyCost">Enter an amount to see the cost.</div>
+      <button class="buy-btn" id="buyBtn" style="display:none;">Mint $PUNK</button>
+      <div class="buy-status" id="buyStatus"></div>
+      <div class="buy-sold" id="buySoldDetail"></div>
+    </div>
+
+    <p class="notes"><strong>Marketplace, coming soon.</strong> A dedicated marketplace on this site where $PUNK inscriptions can live and trade — part of the same ecosystem as the Punks themselves.</p>
+    <p class="notes">No rushed launch. No random promises. Built properly, step by step.</p>
+  </section>
+
+  <script src="js/wallet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+  <script src="js/punk-sale.js"></script>
+</body>
+</html>
