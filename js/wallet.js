@@ -1,9 +1,9 @@
-const ARC_TESTNET = {
-  chainId: "0x4CEF52",
-  chainName: "Arc Testnet",
+const ARC_MAINNET = {
+  chainId: "0x13b2",
+  chainName: "Arc",
   nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
-  rpcUrls: ["https://rpc.testnet.arc.network"],
-  blockExplorerUrls: ["https://testnet.arcscan.app"]
+  rpcUrls: ["https://rpc.arc-scan.org"],
+  blockExplorerUrls: ["https://arc-scan.org"]
 };
 
 const KNOWN_WALLETS = [
@@ -28,16 +28,16 @@ function shortenAddress(addr) {
   return addr.slice(0, 6) + "..." + addr.slice(-4);
 }
 
-async function switchToArcTestnet(provider) {
+async function switchToArcMainnet(provider) {
   try {
-    await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_TESTNET.chainId }] });
+    await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_MAINNET.chainId }] });
   } catch (switchError) {
     const message = (switchError.message || "").toLowerCase();
     const isUnrecognizedChain = switchError.code === 4902 || message.includes("unrecognized chain");
     if (!isUnrecognizedChain) throw switchError;
-    await provider.request({ method: "wallet_addEthereumChain", params: [ARC_TESTNET] });
+    await provider.request({ method: "wallet_addEthereumChain", params: [ARC_MAINNET] });
     try {
-      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_TESTNET.chainId }] });
+      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: ARC_MAINNET.chainId }] });
     } catch {}
   }
 }
@@ -55,7 +55,7 @@ function getRememberedProviderRdns() {
 async function connectToProvider(provider, rdns) {
   try {
     const accounts = await provider.request({ method: "eth_requestAccounts" });
-    await switchToArcTestnet(provider);
+    await switchToArcMainnet(provider);
     walletState.connected = true;
     walletState.address = accounts[0];
     walletState.provider = provider;
