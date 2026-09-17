@@ -1,4 +1,4 @@
-﻿const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const CONTRACT_ABI = ["function ownerOf(uint256 tokenId) view returns (address)"];
 const READ_RPC_URL = "https://rpc.arc-scan.org";
 const MAX_SUPPLY = 10000;
@@ -54,8 +54,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "profile-card";
       card.innerHTML =
-        "<div class=\"profile-card-visual\"><span class=\"profile-card-number\">#" + tokenId + "</span></div>" +
-        "<div class=\"profile-card-footer\"><span class=\"profile-card-name\">ArcPunk</span><a href=\"https://opensea.io/assets/arc/" + CONTRACT_ADDRESS + "/" + tokenId + "\" target=\"_blank\" class=\"profile-card-link\">View on OpenSea</a></div>";
+        "<div class=\"profile-card-glow\"></div>" +
+        "<div class=\"profile-card-visual\"><span class=\"profile-card-hash\">#</span><span class=\"profile-card-number\">" + tokenId + "</span></div>" +
+        "<div class=\"profile-card-footer\"><div><span class=\"profile-card-name\">ArcPunk</span><span class=\"profile-card-collection\">ArcPunks Collection</span></div><a href=\"https://opensea.io/assets/arc/" + CONTRACT_ADDRESS + "/" + tokenId + "\" target=\"_blank\" class=\"profile-card-link\" title=\"View on OpenSea\">?</a></div>";
       grid.appendChild(card);
     });
   }
