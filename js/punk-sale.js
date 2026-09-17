@@ -1,5 +1,5 @@
 const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
-const SALE_CONTRACT_ADDRESS = "0x5581a479c2Cf5FC281f457A27687063805a3BE27";
+const SALE_CONTRACT_ADDRESS = "0x279A1B879cbB43d50C2d64Cc4D1C5E91Ae7E1447";
 const READ_RPC_URLS = ["https://rpc.arc-scan.org", "https://ethereum-rpc.publicnode.com"];
 
 const SALE_ABI = [
@@ -123,8 +123,7 @@ async function doBuy() {
     buyBtn.textContent = "Confirm in wallet...";
     statusEl.textContent = "";
 
-    const tokenAmountWei = ethers.parseEther(selectedAmount.toString());
-    const tx = await saleContract.buy(tokenAmountWei, { value: cost, gasLimit: 300000 });
+    const tx = await saleContract.buy(selectedAmount, { value: cost, gasLimit: 300000 });
     buyBtn.textContent = "Processing...";
     await tx.wait();
 
