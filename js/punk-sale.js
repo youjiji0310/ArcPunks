@@ -48,6 +48,19 @@ function updateCostDisplay() {
   costEl.innerHTML = "Total cost: <strong>" + cost.toFixed(4) + " USDC</strong> for " + amount.toLocaleString() + " $PUNK";
 }
 
+async function refreshMyBalance() {
+  if (!walletState.connected) return;
+  try {
+    const readProvider = new ethers.JsonRpcProvider("https://rpc.arc-scan.org");
+    const readToken = new ethers.Contract(PUNK_TOKEN_ADDRESS, TOKEN_ABI, readProvider);
+    const bal = await readToken.balanceOf(walletState.address);
+    document.getElementById("myBalanceCard").style.display = "flex";
+    document.getElementById("statMyBalance").textContent = Number(ethers.formatEther(bal)).toLocaleString();
+  } catch (err) {
+    console.warn("Could not load balance:", err.message);
+  }
+}
+
 async function connectAndShowBuy() {
   if (!walletState.connected || !walletState.provider) return;
 
@@ -57,6 +70,8 @@ async function connectAndShowBuy() {
 
   document.getElementById("connectBuyBtn").style.display = "none";
   document.getElementById("buyBtn").style.display = "block";
+
+  await refreshMyBalance();
 }
 
 async function doBuy() {
@@ -84,6 +99,7 @@ async function doBuy() {
     statusEl.textContent = "Success! " + amount.toLocaleString() + " $PUNK sent to your wallet.";
     statusEl.className = "punk-buy-status success";
     await refreshSaleStats();
+    await refreshMyBalance();
   } catch (err) {
     console.error(err);
     statusEl.textContent = "Purchase failed: " + (err.reason || err.message);
