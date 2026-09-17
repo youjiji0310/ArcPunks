@@ -31,6 +31,24 @@ let walletTokenIds = [];
 let liveRewards = {};
 let dailyRate = 0.25;
 
+async function getEventsChunked(contract, filter, provider) {
+  const currentBlock = await provider.getBlockNumber();
+  const CHUNK_SIZE = 90000;
+  let fromBlock = 0;
+  let allEvents = [];
+  while (fromBlock <= currentBlock) {
+    const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);
+    try {
+      const events = await contract.queryFilter(filter, fromBlock, toBlock);
+      allEvents = allEvents.concat(events);
+    } catch (err) {
+      console.warn("Erreur sur un range de blocs:", err.message);
+    }
+    fromBlock = toBlock + 1;
+  }
+  return allEvents;
+}
+
 async function initStaking() {
   if (!walletState.connected || !walletState.provider) return;
 
@@ -80,8 +98,8 @@ async function loadStakedTokens() {
     const unstakedFilter = stakingContract.filters.Unstaked(userAddress);
 
     const [stakedEvents, unstakedEvents] = await Promise.all([
-      stakingContract.queryFilter(stakedFilter, 0, "latest"),
-      stakingContract.queryFilter(unstakedFilter, 0, "latest")
+      getEventsChunked(stakingContract, stakedFilter, provider),
+      getEventsChunked(stakingContract, unstakedFilter, provider)
     ]);
 
     const stakedIds = new Set(stakedEvents.map(e => e.args.tokenId.toString()));
@@ -104,7 +122,7 @@ async function loadWalletTokens() {
   walletTokenIds = [];
   try {
     const receivedFilter = nftContract.filters.Transfer(null, userAddress);
-    const receivedEvents = await nftContract.queryFilter(receivedFilter, 0, "latest");
+    const receivedEvents = await getEventsChunked(nftContract, receivedFilter, provider);
 
     const candidateIds = new Set(receivedEvents.map(e => e.args.tokenId.toString()));
 
@@ -133,7 +151,7 @@ function renderStakedGrid() {
   const countLabel = document.getElementById("stakedCountLabel");
   const statStakedCount = document.getElementById("statStakedCount");
 
-  countLabel.textContent = `(${stakedTokenIds.length})`;
+  countLabel.textContent = "(" + stakedTokenIds.length + ")";
   if (statStakedCount) statStakedCount.textContent = stakedTokenIds.length;
   grid.innerHTML = "";
 
@@ -146,20 +164,11 @@ function renderStakedGrid() {
   stakedTokenIds.forEach((tokenId) => {
     const card = document.createElement("div");
     card.className = "staking-card staked";
-    card.innerHTML = `
-      <div class="staking-card-header">
-        <span class="staking-card-id">ArcPunk #${tokenId}</span>
-      </div>
-      <div class="staking-reward-display">
-        <span class="staking-reward-value" id="reward-${tokenId}">0.0000</span>
-        <span class="staking-reward-unit">$PUNK earned</span>
-      </div>
-      <div class="staking-card-actions">
-        <button class="btn btn-outline staking-btn-sm" data-claim="${tokenId}">Claim</button>
-        <button class="btn btn-primary staking-btn-sm" data-unstake="${tokenId}">Unstake</button>
-      </div>
-      <p class="staking-lock-status" id="lock-${tokenId}"></p>
-    `;
+    card.innerHTML =
+      "<div class=\"staking-card-header\"><span class=\"staking-card-id\">ArcPunk #" + tokenId + "</span></div>" +
+      "<div class=\"staking-reward-display\"><span class=\"staking-reward-value\" id=\"reward-" + tokenId + "\">0.0000</span><span class=\"staking-reward-unit\">$PUNK earned</span></div>" +
+      "<div class=\"staking-card-actions\"><button class=\"btn btn-outline staking-btn-sm\" data-claim=\"" + tokenId + "\">Claim</button><button class=\"btn btn-primary staking-btn-sm\" data-unstake=\"" + tokenId + "\">Unstake</button></div>" +
+      "<p class=\"staking-lock-status\" id=\"lock-" + tokenId + "\"></p>";
     grid.appendChild(card);
   });
 
@@ -184,12 +193,9 @@ function renderWalletGrid() {
   walletTokenIds.forEach((tokenId) => {
     const card = document.createElement("div");
     card.className = "staking-card";
-    card.innerHTML = `
-      <div class="staking-card-header">
-        <span class="staking-card-id">ArcPunk #${tokenId}</span>
-      </div>
-      <button class="btn btn-primary staking-btn-sm staking-stake-btn" data-stake="${tokenId}">Stake</button>
-    `;
+    card.innerHTML =
+      "<div class=\"staking-card-header\"><span class=\"staking-card-id\">ArcPunk #" + tokenId + "</span></div>" +
+      "<button class=\"btn btn-primary staking-btn-sm staking-stake-btn\" data-stake=\"" + tokenId + "\">Stake</button>";
     grid.appendChild(card);
   });
 
@@ -260,9 +266,9 @@ async function updateLockStatuses() {
   for (const tokenId of stakedTokenIds) {
     try {
       const can = await stakingContract.canUnstake(tokenId);
-      const el = document.getElementById(`lock-${tokenId}`);
+      const el = document.getElementById("lock-" + tokenId);
       if (el) {
-        el.textContent = can ? "✓ Unlocked" : "🔒 Locked (7-day minimum)";
+        el.textContent = can ? "Unlocked" : "Locked (7-day minimum)";
         el.className = "staking-lock-status " + (can ? "unlocked" : "locked");
       }
     } catch (err) {}
@@ -273,7 +279,7 @@ function tickLiveRewards() {
   stakedTokenIds.forEach((tokenId) => {
     if (!(tokenId in liveRewards)) liveRewards[tokenId] = 0;
     liveRewards[tokenId] += dailyRate / (24 * 60 * 60);
-    const el = document.getElementById(`reward-${tokenId}`);
+    const el = document.getElementById("reward-" + tokenId);
     if (el) el.textContent = liveRewards[tokenId].toFixed(6);
   });
 }

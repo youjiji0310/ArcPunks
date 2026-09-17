@@ -5,9 +5,25 @@ const CONTRACT_ABI = [
   "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)"
 ];
 
-function ipfsToGateway(uri) {
-  if (!uri) return "";
-  return uri.replace("ipfs://", "https://ipfs.io/ipfs/");
+const CHUNK_SIZE = 90000;
+
+async function getTransferEventsChunked(contract, filter, provider) {
+  const currentBlock = await provider.getBlockNumber();
+  let fromBlock = 0;
+  let allEvents = [];
+
+  while (fromBlock <= currentBlock) {
+    const toBlock = Math.min(fromBlock + CHUNK_SIZE, currentBlock);
+    try {
+      const events = await contract.queryFilter(filter, fromBlock, toBlock);
+      allEvents = allEvents.concat(events);
+    } catch (err) {
+      console.warn(`Erreur sur le range ${fromBlock}-${toBlock}:`, err.message);
+    }
+    fromBlock = toBlock + 1;
+  }
+
+  return allEvents;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -29,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const userAddress = walletState.address;
 
       const receivedFilter = contract.filters.Transfer(null, userAddress);
-      const receivedEvents = await contract.queryFilter(receivedFilter, 0, "latest");
+      const receivedEvents = await getTransferEventsChunked(contract, receivedFilter, provider);
       const candidateIds = new Set(receivedEvents.map(e => e.args.tokenId.toString()));
 
       const checks = await Promise.all(
