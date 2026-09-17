@@ -1226,3 +1226,55 @@ header {
     animation: none !important;
   }
 }
+
+/* ===== Manual stake - primary method ===== */
+.staking-manual-primary {
+  background: linear-gradient(180deg, rgba(62,201,242,0.08), var(--panel));
+  border: 1px solid rgba(62, 201, 242, 0.3);
+  border-radius: 18px;
+  padding: 28px;
+  text-align: center;
+}
+
+.staking-manual-intro {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.staking-manual-intro a {
+  color: var(--cyan);
+  text-decoration: underline;
+}
+
+.staking-manual-row-primary {
+  display: flex;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.staking-manual-row-primary input {
+  flex: 1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+
+.staking-beta-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-dimmer);
+  font-weight: 400;
+}
+
+@media (max-width: 500px) {
+  .staking-manual-row-primary { flex-direction: column; }
+}
