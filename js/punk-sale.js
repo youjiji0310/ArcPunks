@@ -123,7 +123,8 @@ async function doBuy() {
     buyBtn.textContent = "Confirm in wallet...";
     statusEl.textContent = "";
 
-    const tx = await saleContract.buy(selectedAmount, { value: cost, gasLimit: 300000 });
+    const tokenAmountWei = ethers.parseEther(selectedAmount.toString());
+    const tx = await saleContract.buy(tokenAmountWei, { value: cost, gasLimit: 300000 });
     buyBtn.textContent = "Processing...";
     await tx.wait();
 
