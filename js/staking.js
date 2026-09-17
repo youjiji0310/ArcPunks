@@ -228,7 +228,7 @@ async function doStake(tokenId, btn) {
   try {
     btn.disabled = true;
     btn.textContent = "Staking...";
-    const tx = await stakingContract.stake(tokenId);
+    const tx = await stakingContract.stake(tokenId, { gasLimit: 300000 });
     await tx.wait();
     await loadEverything();
     await refreshBalance();
@@ -244,7 +244,7 @@ async function doClaim(tokenId, btn) {
   try {
     btn.disabled = true;
     btn.textContent = "Claiming...";
-    const tx = await stakingContract.claim(tokenId);
+    const tx = await stakingContract.claim(tokenId, { gasLimit: 300000 });
     await tx.wait();
     await refreshBalance();
     btn.disabled = false;
@@ -261,7 +261,7 @@ async function doUnstake(tokenId, btn) {
   try {
     btn.disabled = true;
     btn.textContent = "Unstaking...";
-    const tx = await stakingContract.unstake(tokenId);
+    const tx = await stakingContract.unstake(tokenId, { gasLimit: 300000 });
     await tx.wait();
     await loadEverything();
     await refreshBalance();
