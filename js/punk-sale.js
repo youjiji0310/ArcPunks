@@ -47,8 +47,7 @@ async function refreshSaleStats() {
 
       pricePer500Wei = price;
       document.getElementById("statSold").textContent = Number(ethers.formatEther(sold)).toLocaleString();
-      document.getElementById("buySoldDetail").textContent =
-        Number(ethers.formatEther(remaining)).toLocaleString() + " $PUNK remaining in this sale";
+      // ligne retiree
     });
   } catch (err) {
     console.warn("Could not load sale stats after retries:", err.message);
