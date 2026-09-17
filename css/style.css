@@ -1276,3 +1276,39 @@ header {
 @media (max-width: 500px) {
   .punk-amount-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ===== Punk custom allocation input ===== */
+.punk-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding: 4px;
+}
+
+.punk-custom-label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.punk-custom-row input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.punk-custom-hint {
+  font-size: 0.75rem;
+  color: var(--text-dimmer);
+  white-space: nowrap;
+}
+
+@media (max-width: 500px) {
+  .punk-custom-row { flex-wrap: wrap; }
+}

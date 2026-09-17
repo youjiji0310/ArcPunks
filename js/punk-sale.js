@@ -1,4 +1,4 @@
-ï»¿const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
+const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
 const SALE_CONTRACT_ADDRESS = "0x5581a479c2Cf5FC281f457A27687063805a3BE27";
 const READ_RPC_URLS = ["https://rpc.arc-scan.org", "https://ethereum-rpc.publicnode.com"];
 
@@ -52,7 +52,7 @@ async function refreshSaleStats() {
     });
   } catch (err) {
     console.warn("Could not load sale stats after retries:", err.message);
-    document.getElementById("statSold").textContent = "â€”";
+    document.getElementById("statSold").textContent = "—";
   }
 }
 
@@ -67,7 +67,7 @@ async function refreshMyBalance() {
     });
   } catch (err) {
     console.warn("Could not load balance after retries:", err.message);
-    document.getElementById("statMyBalance").textContent = "â€”";
+    document.getElementById("statMyBalance").textContent = "—";
   }
 }
 
@@ -149,8 +149,23 @@ document.addEventListener("DOMContentLoaded", () => {
   refreshSaleStats();
 
   document.querySelectorAll(".punk-amount-btn").forEach((btn) => {
-    btn.addEventListener("click", () => selectAmount(Number(btn.dataset.amount), btn));
+    btn.addEventListener("click", () => {
+      document.getElementById("customAllocations").value = "";
+      selectAmount(Number(btn.dataset.amount), btn);
+    });
   });
+
+  const customInput = document.getElementById("customAllocations");
+  if (customInput) {
+    customInput.addEventListener("input", () => {
+      const allocations = Number(customInput.value);
+      if (allocations > 0) {
+        selectAmount(allocations * 500, null);
+      } else {
+        selectAmount(0, null);
+      }
+    });
+  }
 
   const connectBtn = document.getElementById("connectBuyBtn");
   const buyBtn = document.getElementById("buyBtn");
