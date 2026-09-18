@@ -25,70 +25,65 @@
     </button>
   </header>
 
-  <main class="burn-page">
-    <div class="burn-header-icon">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="46" class="burn-ring-outer"/>
-        <circle cx="50" cy="50" r="46" class="burn-ring-dash"/>
-        <path d="M50 25 C40 40, 35 50, 42 58 C45 62, 50 60, 48 55 C55 60, 58 68, 50 75 C62 72, 68 62, 62 50 C60 45, 55 42, 56 36 C53 40, 50 42, 50 25 Z" class="burn-flame-icon"/>
-      </svg>
-    </div>
+  <main class="profile-page">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Permanent Action</div>
+    <h1 class="headline profile-headline">Burn <span class="accent">ArcPunks</span></h1>
+    <p class="subcopy profile-subcopy">
+      Burning is permanent and irreversible — burned NFTs are sent to a dead address and can never be recovered.
+      It may make you eligible for guaranteed whitelist on a future migration.
+    </p>
 
-    <h1 class="soft-stake-title">Burn ArcPunks</h1>
-
-    <div class="burn-warning-card">
-      <p><strong>This is permanent and irreversible.</strong> Burned NFTs are sent to a dead address and can never be recovered.</p>
-      <p>Burning may make you eligible for guaranteed whitelist on a future migration.</p>
-    </div>
-
-    <div id="stakingConnectPrompt" class="soft-connect-prompt">
+    <div id="stakingConnectPrompt" class="profile-empty">
       <button class="btn btn-primary" id="stakingConnectBtn">Connect Wallet</button>
     </div>
 
     <div id="stakingContent" style="display:none;">
-      <section class="soft-section">
-        <div class="soft-section-header">
-          <h2>Your ArcPunks <span id="walletCountLabel">(0)</span></h2>
-          <div class="soft-section-actions">
-            <button class="soft-link-btn" id="selectAllBtn">Select all</button>
-            <button class="btn btn-danger btn-sm" id="burnSelectedBtn">Burn selected</button>
-          </div>
+      <div class="burn-toolbar">
+        <span class="burn-toolbar-count" id="walletCountLabel">0 ArcPunks</span>
+        <div class="burn-toolbar-actions">
+          <button class="soft-link-btn" id="selectAllBtn">Select all</button>
+          <button class="btn btn-danger btn-sm" id="burnSelectedBtn">Burn selected</button>
         </div>
-        <div id="walletGrid" class="soft-grid"></div>
-        <p id="walletEmptyMsg" class="soft-empty-msg" style="display:none;">No ArcPunks found yet. Scan running in background, or add one manually below.</p>
+      </div>
+
+      <div id="walletGrid" class="profile-grid burn-grid"></div>
+      <p id="walletEmptyMsg" class="profile-none" style="display:none;">No ArcPunks found yet. Scan running in background, or add one manually below.</p>
+
+      <div class="burn-manual-card">
+        <p>Don't see a punk? Add it by Token ID:</p>
         <div class="soft-manual-row">
-          <input type="number" id="manualTokenId" placeholder="Add by Token ID" min="1">
+          <input type="number" id="manualTokenId" placeholder="Token ID" min="1">
           <button class="btn btn-outline" id="manualAddBtn">Add</button>
         </div>
         <div id="scanStatus" class="soft-scan-status"></div>
-      </section>
+      </div>
 
       <p class="punk-buy-status" id="burnStatus"></p>
     </div>
-
-    <div class="burn-machine" id="burnMachine" aria-hidden="true">
-      <div class="burn-hopper">
-        <div class="burn-hopper-mouth"></div>
-        <div class="burn-falling-item" id="burnFallingItem"></div>
-      </div>
-      <div class="burn-flame-emoji">
-        <svg viewBox="0 0 100 100" width="60" height="60">
-          <path d="M50 25 C40 40, 35 50, 42 58 C45 62, 50 60, 48 55 C55 60, 58 68, 50 75 C62 72, 68 62, 62 50 C60 45, 55 42, 56 36 C53 40, 50 42, 50 25 Z" fill="#ff7a1a"/>
-        </svg>
-      </div>
-      <div class="burn-particles" id="burnParticles"></div>
-    </div>
-
-    <div class="burn-success-msg" id="burnSuccessMsg">
-      <div class="burn-success-icon">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M20 6L9 17l-5-5"/>
-        </svg>
-      </div>
-      <h2>Burned</h2>
-      <p id="burnSuccessText"></p>
-    </div>
   </main>
+
+  <div class="burn-machine" id="burnMachine" aria-hidden="true">
+    <div class="burn-hopper">
+      <div class="burn-hopper-mouth"></div>
+      <div class="burn-falling-item" id="burnFallingItem"></div>
+    </div>
+    <div class="burn-flame-emoji">
+      <svg viewBox="0 0 100 100" width="60" height="60">
+        <path d="M50 25 C40 40, 35 50, 42 58 C45 62, 50 60, 48 55 C55 60, 58 68, 50 75 C62 72, 68 62, 62 50 C60 45, 55 42, 56 36 C53 40, 50 42, 50 25 Z" fill="#ff7a1a"/>
+      </svg>
+    </div>
+    <div class="burn-particles" id="burnParticles"></div>
+  </div>
+
+  <div class="burn-success-msg" id="burnSuccessMsg">
+    <div class="burn-success-icon">
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+    <h2>Burned</h2>
+    <p id="burnSuccessText"></p>
+  </div>
 
   <footer class="footer">
     <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
