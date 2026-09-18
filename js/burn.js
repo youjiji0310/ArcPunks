@@ -115,6 +115,47 @@ async function scanWalletInBackground() {
   if (statusEl) statusEl.textContent = "";
 }
 
+function playBurnAnimation(tokenId) {
+  return new Promise((resolve) => {
+    const machine = document.getElementById("burnMachine");
+    const fallingItem = document.getElementById("burnFallingItem");
+    const particlesEl = document.getElementById("burnParticles");
+
+    machine.classList.add("active");
+    fallingItem.textContent = "#" + tokenId;
+    fallingItem.classList.remove("falling");
+
+    requestAnimationFrame(() => {
+      fallingItem.classList.add("falling");
+    });
+
+    setTimeout(() => {
+      particlesEl.innerHTML = "";
+      for (let i = 0; i < 16; i++) {
+        const p = document.createElement("span");
+        p.className = "burn-particle";
+        p.style.left = (45 + Math.random() * 10) + "%";
+        p.style.animationDelay = (Math.random() * 0.2) + "s";
+        p.style.setProperty("--tx", (Math.random() * 80 - 40) + "px");
+        particlesEl.appendChild(p);
+      }
+    }, 900);
+
+    setTimeout(() => {
+      machine.classList.remove("active");
+      resolve();
+    }, 1800);
+  });
+}
+
+function showBurnSuccess(count) {
+  const msgEl = document.getElementById("burnSuccessMsg");
+  const textEl = document.getElementById("burnSuccessText");
+  textEl.textContent = count + " ArcPunk" + (count > 1 ? "s" : "") + " burned successfully. Your wallet is now recorded for future GTD WL eligibility.";
+  msgEl.classList.add("visible");
+  setTimeout(() => msgEl.classList.remove("visible"), 4000);
+}
+
 async function doBurnSelected() {
   const statusEl = document.getElementById("burnStatus");
   const burnBtn = document.getElementById("burnSelectedBtn");
@@ -138,6 +179,7 @@ async function doBurnSelected() {
       await tx.wait();
       burned++;
       walletTokenIds = walletTokenIds.filter((t) => t !== id);
+      await playBurnAnimation(id);
     } catch (err) {
       console.error("Failed to burn #" + id + ":", err);
     }
@@ -147,8 +189,8 @@ async function doBurnSelected() {
   selectedIds.clear();
   renderWalletGrid();
 
-  statusEl.textContent = burned + " ArcPunk(s) burned successfully. Your wallet is now recorded for future GTD WL eligibility.";
-  statusEl.className = "punk-buy-status success";
+  if (burned > 0) showBurnSuccess(burned);
+  statusEl.textContent = "";
   burnBtn.disabled = false;
   burnBtn.textContent = "Burn selected";
 }

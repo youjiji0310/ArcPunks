@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Burn — ArcPunks</title>
+  <title>Burn � ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,7 +27,22 @@
 
   <main class="soft-stake-page">
     <h1 class="soft-stake-title">Burn ArcPunks</h1>
-    <p class="soft-stake-subtitle burn-warning">⚠️ This is permanent and irreversible. Burned NFTs are sent to a dead address and can never be recovered.<br>Burning may make you eligible for guaranteed whitelist on a future migration.</p>
+    <p class="soft-stake-subtitle burn-warning">?? This is permanent and irreversible. Burned NFTs are sent to a dead address and can never be recovered.<br>Burning may make you eligible for guaranteed whitelist on a future migration.</p>
+
+    <div class="burn-machine" id="burnMachine" aria-hidden="true">
+      <div class="burn-hopper">
+        <div class="burn-hopper-mouth"></div>
+        <div class="burn-falling-item" id="burnFallingItem"></div>
+      </div>
+      <div class="burn-flame">??</div>
+      <div class="burn-particles" id="burnParticles"></div>
+    </div>
+
+    <div class="burn-success-msg" id="burnSuccessMsg">
+      <span class="burn-success-icon">??</span>
+      <h2>Burned!</h2>
+      <p id="burnSuccessText"></p>
+    </div>
 
     <div id="stakingConnectPrompt" class="soft-connect-prompt">
       <button class="btn btn-primary" id="stakingConnectBtn">Connect Wallet</button>
@@ -56,7 +71,7 @@
   </main>
 
   <footer class="footer">
-    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <p>ArcPunks � not affiliated with Arc L1. Built by the community, for the community.</p>
     <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
   </footer>
 
