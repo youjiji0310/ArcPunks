@@ -53,8 +53,30 @@ async function initBurn() {
 
   loadWalletIds();
   renderWalletGrid();
+  updateGtdProgress();
   await pruneStaleTokens();
   scanWalletInBackground();
+}
+
+function burnCountKey() { return "arcpunks_burn_count_" + userAddress.toLowerCase(); }
+
+function getBurnCount() {
+  return Number(localStorage.getItem(burnCountKey()) || "0");
+}
+
+function addBurnCount(n) {
+  const current = getBurnCount();
+  localStorage.setItem(burnCountKey(), (current + n).toString());
+  updateGtdProgress();
+}
+
+function updateGtdProgress() {
+  const total = getBurnCount();
+  const inCurrentCycle = total % 5;
+  const fillEl = document.getElementById("gtdFill");
+  const countEl = document.getElementById("gtdCount");
+  if (fillEl) fillEl.style.width = (inCurrentCycle / 5 * 100) + "%";
+  if (countEl) countEl.textContent = inCurrentCycle + " / 5";
 }
 
 function renderWalletGrid() {
@@ -151,9 +173,15 @@ function playBurnAnimation(tokenId) {
 function showBurnSuccess(count) {
   const msgEl = document.getElementById("burnSuccessMsg");
   const textEl = document.getElementById("burnSuccessText");
-  textEl.textContent = count + " ArcPunk" + (count > 1 ? "s" : "") + " burned successfully. Your wallet is now recorded for future GTD WL eligibility.";
+  const total = getBurnCount();
+  const cyclesCompleted = Math.floor(total / 5);
+  const remaining = 5 - (total % 5);
+  let extra = cyclesCompleted > 0
+    ? " You've earned " + cyclesCompleted + " GTD spot" + (cyclesCompleted > 1 ? "s" : "") + " so far."
+    : " " + remaining + " more burn" + (remaining > 1 ? "s" : "") + " until your next GTD spot.";
+  textEl.textContent = count + " ArcPunk" + (count > 1 ? "s" : "") + " burned successfully." + extra;
   msgEl.classList.add("visible");
-  setTimeout(() => msgEl.classList.remove("visible"), 4000);
+  setTimeout(() => msgEl.classList.remove("visible"), 5000);
 }
 
 async function doBurnSelected() {
@@ -189,7 +217,10 @@ async function doBurnSelected() {
   selectedIds.clear();
   renderWalletGrid();
 
-  if (burned > 0) showBurnSuccess(burned);
+  if (burned > 0) {
+    addBurnCount(burned);
+    showBurnSuccess(burned);
+  }
   statusEl.textContent = "";
   burnBtn.disabled = false;
   burnBtn.textContent = "Burn selected";
