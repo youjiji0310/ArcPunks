@@ -1,4 +1,4 @@
-﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 const READ_RPC_URL = "https://rpc.arc-scan.org";
 const MAX_SUPPLY = 10000;
@@ -23,6 +23,23 @@ function loadWalletIds() {
 }
 function saveWalletIds() { localStorage.setItem(walletKey(), JSON.stringify(walletTokenIds)); }
 
+async function pruneStaleTokens() {
+  if (walletTokenIds.length === 0) return;
+  const readProvider = new ethers.JsonRpcProvider(READ_RPC_URL);
+  const readContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, ["function ownerOf(uint256) view returns (address)"], readProvider);
+
+  const stillOwned = [];
+  for (const id of walletTokenIds) {
+    try {
+      const owner = await readContract.ownerOf(id);
+      if (owner.toLowerCase() === userAddress.toLowerCase()) stillOwned.push(id);
+    } catch {}
+  }
+  walletTokenIds = stillOwned;
+  saveWalletIds();
+  renderWalletGrid();
+}
+
 async function initBurn() {
   if (!walletState.connected || !walletState.provider) return;
 
@@ -36,6 +53,7 @@ async function initBurn() {
 
   loadWalletIds();
   renderWalletGrid();
+  await pruneStaleTokens();
   scanWalletInBackground();
 }
 
@@ -57,7 +75,7 @@ function renderWalletGrid() {
     const card = document.createElement("div");
     card.className = "soft-card selectable" + (selectedIds.has(id) ? " selected" : "");
     card.dataset.id = id;
-    card.innerHTML = "<div class=\"soft-card-id\">#" + id + "</div><div class=\"soft-check\">✓</div>";
+    card.innerHTML = "<div class=\"soft-card-id\">#" + id + "</div><div class=\"soft-check\">?</div>";
     card.addEventListener("click", () => {
       if (selectedIds.has(id)) selectedIds.delete(id);
       else selectedIds.add(id);
