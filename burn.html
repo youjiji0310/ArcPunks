@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Burn — ArcPunks</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="brand">ArcPunks</a>
+    <nav class="nav-links" id="navLinks">
+      <a href="/profile">My Punks</a>
+      <a href="/roadmap">Roadmap</a>
+      <a href="/staking">Staking</a>
+      <a href="/token">$PUNK Token</a>
+      <a href="/punk-marketplace">Marketplace</a>
+    </nav>
+    <button class="btn btn-outline nav-cta" id="navWalletBtn">Connect Wallet</button>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main class="soft-stake-page">
+    <h1 class="soft-stake-title">Burn ArcPunks</h1>
+    <p class="soft-stake-subtitle burn-warning">⚠️ This is permanent and irreversible. Burned NFTs are sent to a dead address and can never be recovered.<br>Burning may make you eligible for guaranteed whitelist on a future migration.</p>
+
+    <div id="stakingConnectPrompt" class="soft-connect-prompt">
+      <button class="btn btn-primary" id="stakingConnectBtn">Connect Wallet</button>
+    </div>
+
+    <div id="stakingContent" style="display:none;">
+      <section class="soft-section">
+        <div class="soft-section-header">
+          <h2>Your ArcPunks <span id="walletCountLabel">(0)</span></h2>
+          <div class="soft-section-actions">
+            <button class="soft-link-btn" id="selectAllBtn">Select all</button>
+            <button class="btn btn-primary btn-sm" id="burnSelectedBtn" style="background:#ff6b6b; border-color:#ff6b6b;">Burn selected</button>
+          </div>
+        </div>
+        <div id="walletGrid" class="soft-grid"></div>
+        <p id="walletEmptyMsg" class="soft-empty-msg" style="display:none;">No ArcPunks found yet. Scan running in background, or add one manually below.</p>
+        <div class="soft-manual-row">
+          <input type="number" id="manualTokenId" placeholder="Add by Token ID" min="1">
+          <button class="btn btn-outline" id="manualAddBtn">Add</button>
+        </div>
+        <div id="scanStatus" class="soft-scan-status"></div>
+      </section>
+
+      <p class="punk-buy-status" id="burnStatus"></p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
+  </footer>
+
+  <script src="js/wallet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+  <script src="js/burn.js"></script>
+  <script src="js/nav.js"></script>
+</body>
+</html>
