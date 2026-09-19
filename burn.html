@@ -37,10 +37,33 @@
     </div>
 
     <div id="stakingContent" style="display:none;">
-      <div class="burn-gtd-progress">
-        <span class="burn-gtd-label">Your burns toward next GTD spot</span>
-        <div class="burn-gtd-bar"><div class="burn-gtd-fill" id="gtdFill"></div></div>
-        <span class="burn-gtd-count" id="gtdCount">0 / 5</span>
+      <div class="burn-gtd-card">
+        <h3>Guaranteed Whitelist Requirements</h3>
+        <p class="burn-gtd-intro">Burning is your ticket to the next migration: 1000 GTD spots (free mint), 9000 public (0.5 USDC). Burn both requirements below to earn 1 GTD spot.</p>
+
+        <div class="burn-gtd-row">
+          <div class="burn-gtd-progress">
+            <span class="burn-gtd-label">ArcPunks burned</span>
+            <div class="burn-gtd-bar"><div class="burn-gtd-fill" id="gtdNftFill"></div></div>
+            <span class="burn-gtd-count" id="gtdNftCount">0 / 5</span>
+          </div>
+          <div class="burn-gtd-progress">
+            <span class="burn-gtd-label">$PUNK burned</span>
+            <div class="burn-gtd-bar punk"><div class="burn-gtd-fill punk" id="gtdPunkFill"></div></div>
+            <span class="burn-gtd-count" id="gtdPunkCount">0 / 10,000</span>
+          </div>
+        </div>
+
+        <div class="burn-gtd-spots">GTD spots earned: <strong id="gtdSpotsEarned">0</strong></div>
+      </div>
+
+      <div class="burn-punk-section">
+        <h3>Burn $PUNK</h3>
+        <div class="burn-punk-row">
+          <input type="number" id="punkBurnAmount" value="10000" min="1" step="1">
+          <button class="btn btn-danger" id="burnPunkBtn">Burn $PUNK</button>
+        </div>
+        <p class="burn-punk-balance" id="punkBalanceDisplay">Your balance: — $PUNK</p>
       </div>
 
       <div class="burn-toolbar">

@@ -1833,3 +1833,133 @@ header {
   font-weight: 700;
   color: var(--text);
 }
+
+/* ===== GTD requirements card + PUNK burn section ===== */
+.burn-gtd-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.burn-gtd-card h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.burn-gtd-intro {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+.burn-gtd-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .burn-gtd-row { grid-template-columns: 1fr; }
+}
+
+.burn-gtd-progress { text-align: center; }
+
+.burn-gtd-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.burn-gtd-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--panel-2);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.burn-gtd-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff7a1a, #ff6b6b);
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.5);
+  transition: width 0.4s ease;
+}
+
+.burn-gtd-bar.punk { }
+.burn-gtd-fill.punk {
+  background: linear-gradient(90deg, var(--cyan), #7ee0f8);
+  box-shadow: 0 0 10px rgba(62, 201, 242, 0.5);
+}
+
+.burn-gtd-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.burn-gtd-spots {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.burn-gtd-spots strong {
+  color: var(--cyan);
+  font-size: 1.1rem;
+}
+
+.burn-punk-section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.burn-punk-section h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.burn-punk-row {
+  display: flex;
+  gap: 10px;
+  max-width: 340px;
+  margin: 0 auto 12px;
+}
+
+.burn-punk-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.burn-punk-balance {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-dimmer);
+}
