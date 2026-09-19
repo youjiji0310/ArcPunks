@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+ï»¿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Burn — ArcPunks</title>
+  <title>Burn â€” ArcPunks</title>
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -25,70 +25,112 @@
     </button>
   </header>
 
-  <main class="profile-page">
+  <main class="burnpg">
+    <div class="burnpg-glow" aria-hidden="true"></div>
+
     <div class="eyebrow" style="justify-content:center;"><span class="dot"></span> Permanent Action</div>
-    <h1 class="headline profile-headline">Burn <span class="accent">ArcPunks</span></h1>
-    <p class="subcopy profile-subcopy">
-      Burning is permanent and irreversible — burned NFTs are sent to a dead address and can never be recovered.<br>Every 5 ArcPunks burned = 1 guaranteed whitelist (GTD) spot on a future migration.
-    </p>
+    <h1 class="headline burnpg-headline">Burn <span class="accent">ArcPunks</span></h1>
+    <p class="subcopy burnpg-subcopy">Complete both steps to earn 1 guaranteed whitelist (GTD) spot on a future migration.</p>
 
     <div id="stakingConnectPrompt" class="profile-empty">
       <button class="btn btn-primary" id="stakingConnectBtn">Connect Wallet</button>
     </div>
 
     <div id="stakingContent" style="display:none;">
-      <div class="burn-gtd-card">
-        <h3>Guaranteed Whitelist Requirements</h3>
-        <p class="burn-gtd-intro">Burn both requirements below to earn 1 guaranteed whitelist (GTD) spot on a future migration.</p>
 
-        <div class="burn-gtd-row">
-          <div class="burn-gtd-progress">
-            <span class="burn-gtd-label">ArcPunks burned</span>
-            <div class="burn-gtd-bar"><div class="burn-gtd-fill" id="gtdNftFill"></div></div>
-            <span class="burn-gtd-count" id="gtdNftCount">0 / 5</span>
+      <div class="burnpg-spots-banner">
+        <span class="burnpg-spots-label">GTD spots earned</span>
+        <span class="burnpg-spots-value" id="gtdSpotsEarned">0</span>
+      </div>
+
+      <!-- STEP 1 -->
+      <section class="burnpg-step" id="stepNft">
+        <div class="burnpg-step-head">
+          <div class="burnpg-step-badge" id="step1Badge">1</div>
+          <div class="burnpg-step-head-text">
+            <h2>Burn 5 ArcPunks</h2>
+            <p>Select ArcPunks from your wallet and burn them permanently.</p>
           </div>
-          <div class="burn-gtd-progress">
-            <span class="burn-gtd-label">$PUNK burned</span>
-            <div class="burn-gtd-bar punk"><div class="burn-gtd-fill punk" id="gtdPunkFill"></div></div>
-            <span class="burn-gtd-count" id="gtdPunkCount">0 / 10,000</span>
+          <div class="burnpg-step-progress">
+            <div class="burnpg-ring-wrap">
+              <svg viewBox="0 0 60 60" class="burnpg-ring">
+                <circle cx="30" cy="30" r="26" class="burnpg-ring-track"/>
+                <circle cx="30" cy="30" r="26" class="burnpg-ring-fill" id="nftRingFill"/>
+              </svg>
+              <span class="burnpg-ring-text" id="gtdNftCount">0/5</span>
+            </div>
           </div>
         </div>
 
-        <div class="burn-gtd-spots">GTD spots earned: <strong id="gtdSpotsEarned">0</strong></div>
-      </div>
-
-      <div class="burn-punk-section">
-        <h3>Burn $PUNK</h3>
-        <div class="burn-punk-row">
-          <input type="number" id="punkBurnAmount" value="10000" min="1" step="1">
-          <button class="btn btn-danger" id="burnPunkBtn">Burn $PUNK</button>
+        <div class="burnpg-toolbar">
+          <span class="burnpg-toolbar-count" id="walletCountLabel">0 ArcPunks in wallet</span>
+          <div class="burnpg-toolbar-actions">
+            <button class="soft-link-btn" id="selectAllBtn">Select all</button>
+            <button class="btn btn-danger btn-sm" id="burnSelectedBtn">Burn selected</button>
+          </div>
         </div>
-        <p class="burn-punk-balance" id="punkBalanceDisplay">Your balance: — $PUNK</p>
-      </div>
 
-      <div class="burn-toolbar">
-        <span class="burn-toolbar-count" id="walletCountLabel">0 ArcPunks</span>
-        <div class="burn-toolbar-actions">
-          <button class="soft-link-btn" id="selectAllBtn">Select all</button>
-          <button class="btn btn-danger btn-sm" id="burnSelectedBtn">Burn selected</button>
-        </div>
-      </div>
+        <div id="walletGrid" class="profile-grid burn-grid"></div>
+        <p id="walletEmptyMsg" class="profile-none" style="display:none;">No ArcPunks found yet. Scan running in background, or add one manually below.</p>
 
-      <div id="walletGrid" class="profile-grid burn-grid"></div>
-      <p id="walletEmptyMsg" class="profile-none" style="display:none;">No ArcPunks found yet. Scan running in background, or add one manually below.</p>
-
-      <div class="burn-manual-card">
-        <p>Don't see a punk? Add it by Token ID:</p>
-        <div class="soft-manual-row">
-          <input type="number" id="manualTokenId" placeholder="Token ID" min="1">
+        <div class="burnpg-manual-row">
+          <input type="number" id="manualTokenId" placeholder="Add by Token ID" min="1">
           <button class="btn btn-outline" id="manualAddBtn">Add</button>
         </div>
         <div id="scanStatus" class="soft-scan-status"></div>
-      </div>
+      </section>
+
+      <div class="burnpg-connector"></div>
+
+      <!-- STEP 2 -->
+      <section class="burnpg-step" id="stepPunk">
+        <div class="burnpg-lock-overlay" id="stepPunkLock">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span>Complete Step 1 to unlock</span>
+        </div>
+
+        <div class="burnpg-step-head">
+          <div class="burnpg-step-badge" id="step2Badge">2</div>
+          <div class="burnpg-step-head-text">
+            <h2>Burn 10,000 $PUNK</h2>
+            <p>Burn $PUNK tokens to complete this GTD cycle.</p>
+          </div>
+          <div class="burnpg-step-progress">
+            <div class="burnpg-ring-wrap">
+              <svg viewBox="0 0 60 60" class="burnpg-ring">
+                <circle cx="30" cy="30" r="26" class="burnpg-ring-track"/>
+                <circle cx="30" cy="30" r="26" class="burnpg-ring-fill punk" id="punkRingFill"/>
+              </svg>
+              <span class="burnpg-ring-text" id="gtdPunkCount">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="burnpg-punk-row">
+          <input type="number" id="punkBurnAmount" value="10000" min="1" step="1">
+          <button class="btn btn-danger" id="burnPunkBtn">Burn $PUNK</button>
+        </div>
+        <p class="burnpg-punk-balance" id="punkBalanceDisplay">Your balance: â€” $PUNK</p>
+      </section>
 
       <p class="punk-buy-status" id="burnStatus"></p>
     </div>
   </main>
+
+  <!-- Custom confirm modal -->
+  <div class="burnpg-confirm-overlay" id="burnConfirmOverlay">
+    <div class="burnpg-confirm-panel">
+      <div class="burnpg-confirm-icon">
+        <svg viewBox="0 0 100 100" width="48" height="48"><path d="M50 25 C40 40, 35 50, 42 58 C45 62, 50 60, 48 55 C55 60, 58 68, 50 75 C62 72, 68 62, 62 50 C60 45, 55 42, 56 36 C53 40, 50 42, 50 25 Z" fill="#ff7a1a"/></svg>
+      </div>
+      <h3 id="burnConfirmTitle">Burn this?</h3>
+      <p id="burnConfirmMessage">This action is permanent and cannot be undone.</p>
+      <div class="burnpg-confirm-actions">
+        <button class="btn btn-outline" id="burnConfirmCancel">Cancel</button>
+        <button class="btn btn-danger" id="burnConfirmOk">Burn Permanently</button>
+      </div>
+    </div>
+  </div>
 
   <div class="burn-machine" id="burnMachine" aria-hidden="true">
     <div class="burn-hopper">
@@ -114,7 +156,7 @@
   </div>
 
   <footer class="footer">
-    <p>ArcPunks — not affiliated with Arc L1. Built by the community, for the community.</p>
+    <p>ArcPunks â€” not affiliated with Arc L1. Built by the community, for the community.</p>
     <a href="https://x.com/Arc_Punks" target="_blank" rel="noopener noreferrer" class="footer-social">Follow on X</a>
   </footer>
 

@@ -7,6 +7,7 @@ const SCAN_BATCH = 25;
 const SCAN_DELAY = 130;
 const NFT_REQUIRED = 5;
 const PUNK_REQUIRED = 10000;
+const RING_CIRCUMFERENCE = 2 * Math.PI * 26;
 
 const NFT_ABI = [
   "function ownerOf(uint256 tokenId) view returns (address)",
@@ -23,8 +24,7 @@ let selectedIds = new Set();
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 function walletKey() { return "arcpunks_wallet_" + userAddress.toLowerCase(); }
-function nftBurnKey() { return "arcpunks_burn_nft_" + userAddress.toLowerCase(); }
-function punkBurnKey() { return "arcpunks_burn_punk_" + userAddress.toLowerCase(); }
+function cycleKey() { return "arcpunks_burn_cycle_" + userAddress.toLowerCase(); }
 
 function loadWalletIds() {
   try { walletTokenIds = [...new Set(JSON.parse(localStorage.getItem(walletKey()) || "[]"))]; }
@@ -32,30 +32,78 @@ function loadWalletIds() {
 }
 function saveWalletIds() { localStorage.setItem(walletKey(), JSON.stringify(walletTokenIds)); }
 
-function getNftBurnCount() { return Number(localStorage.getItem(nftBurnKey()) || "0"); }
-function addNftBurnCount(n) { localStorage.setItem(nftBurnKey(), (getNftBurnCount() + n).toString()); }
+function getCycle() {
+  try {
+    return JSON.parse(localStorage.getItem(cycleKey()) || "{}");
+  } catch {
+    return {};
+  }
+}
+function getState() {
+  const c = getCycle();
+  return {
+    nftInCycle: c.nftInCycle || 0,
+    punkInCycle: c.punkInCycle || 0,
+    spotsEarned: c.spotsEarned || 0
+  };
+}
+function saveState(state) {
+  localStorage.setItem(cycleKey(), JSON.stringify(state));
+}
 
-function getPunkBurnCount() { return Number(localStorage.getItem(punkBurnKey()) || "0"); }
-function addPunkBurnCount(n) { localStorage.setItem(punkBurnKey(), (getPunkBurnCount() + n).toString()); }
+function addNftBurns(n) {
+  const s = getState();
+  s.nftInCycle = Math.min(NFT_REQUIRED, s.nftInCycle + n);
+  saveState(s);
+}
 
-function updateGtdProgress() {
-  const nftTotal = getNftBurnCount();
-  const punkTotal = getPunkBurnCount();
-  const nftInCycle = nftTotal % NFT_REQUIRED;
-  const punkInCycle = punkTotal % PUNK_REQUIRED;
-  const spotsEarned = Math.min(Math.floor(nftTotal / NFT_REQUIRED), Math.floor(punkTotal / PUNK_REQUIRED));
+function addPunkBurns(amount) {
+  const s = getState();
+  s.punkInCycle = s.punkInCycle + amount;
+  if (s.nftInCycle >= NFT_REQUIRED && s.punkInCycle >= PUNK_REQUIRED) {
+    s.spotsEarned += 1;
+    s.nftInCycle = 0;
+    s.punkInCycle = 0;
+  }
+  saveState(s);
+}
 
-  const nftFill = document.getElementById("gtdNftFill");
-  const nftCount = document.getElementById("gtdNftCount");
-  const punkFill = document.getElementById("gtdPunkFill");
-  const punkCount = document.getElementById("gtdPunkCount");
-  const spotsEl = document.getElementById("gtdSpotsEarned");
+function updateGtdUI() {
+  const s = getState();
+  const nftPct = Math.min(1, s.nftInCycle / NFT_REQUIRED);
+  const punkPct = Math.min(1, s.punkInCycle / PUNK_REQUIRED);
 
-  if (nftFill) nftFill.style.width = (nftInCycle / NFT_REQUIRED * 100) + "%";
-  if (nftCount) nftCount.textContent = nftInCycle + " / " + NFT_REQUIRED;
-  if (punkFill) punkFill.style.width = (punkInCycle / PUNK_REQUIRED * 100) + "%";
-  if (punkCount) punkCount.textContent = punkInCycle.toLocaleString() + " / " + PUNK_REQUIRED.toLocaleString();
-  if (spotsEl) spotsEl.textContent = spotsEarned;
+  const nftRing = document.getElementById("nftRingFill");
+  const punkRing = document.getElementById("punkRingFill");
+  if (nftRing) {
+    nftRing.style.strokeDasharray = RING_CIRCUMFERENCE;
+    nftRing.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - nftPct);
+  }
+  if (punkRing) {
+    punkRing.style.strokeDasharray = RING_CIRCUMFERENCE;
+    punkRing.style.strokeDashoffset = RING_CIRCUMFERENCE * (1 - punkPct);
+  }
+
+  document.getElementById("gtdNftCount").textContent = s.nftInCycle + "/" + NFT_REQUIRED;
+  document.getElementById("gtdPunkCount").textContent = Math.round(punkPct * 100) + "%";
+  document.getElementById("gtdSpotsEarned").textContent = s.spotsEarned;
+
+  const step1Badge = document.getElementById("step1Badge");
+  const step2Badge = document.getElementById("step2Badge");
+  const stepPunk = document.getElementById("stepPunk");
+  const lockOverlay = document.getElementById("stepPunkLock");
+
+  const step1Done = s.nftInCycle >= NFT_REQUIRED;
+  step1Badge.classList.toggle("done", step1Done);
+  step2Badge.classList.toggle("done", punkPct >= 1);
+
+  if (step1Done) {
+    stepPunk.classList.add("unlocked");
+    lockOverlay.style.display = "none";
+  } else {
+    stepPunk.classList.remove("unlocked");
+    lockOverlay.style.display = "flex";
+  }
 }
 
 async function refreshPunkBalance() {
@@ -84,7 +132,7 @@ async function initBurn() {
 
   loadWalletIds();
   renderWalletGrid();
-  updateGtdProgress();
+  updateGtdUI();
   await refreshPunkBalance();
   await pruneStaleTokens();
   scanWalletInBackground();
@@ -112,7 +160,7 @@ function renderWalletGrid() {
   const emptyMsg = document.getElementById("walletEmptyMsg");
   const countLabel = document.getElementById("walletCountLabel");
 
-  countLabel.textContent = walletTokenIds.length + " ArcPunk" + (walletTokenIds.length === 1 ? "" : "s");
+  countLabel.textContent = walletTokenIds.length + " ArcPunk" + (walletTokenIds.length === 1 ? "" : "s") + " in wallet";
   grid.innerHTML = "";
 
   if (walletTokenIds.length === 0) {
@@ -168,6 +216,30 @@ async function scanWalletInBackground() {
   if (statusEl) statusEl.textContent = "";
 }
 
+function showConfirmModal(title, message) {
+  return new Promise((resolve) => {
+    const overlay = document.getElementById("burnConfirmOverlay");
+    document.getElementById("burnConfirmTitle").textContent = title;
+    document.getElementById("burnConfirmMessage").textContent = message;
+    overlay.classList.add("visible");
+
+    const okBtn = document.getElementById("burnConfirmOk");
+    const cancelBtn = document.getElementById("burnConfirmCancel");
+
+    function cleanup(result) {
+      overlay.classList.remove("visible");
+      okBtn.removeEventListener("click", onOk);
+      cancelBtn.removeEventListener("click", onCancel);
+      resolve(result);
+    }
+    function onOk() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+
+    okBtn.addEventListener("click", onOk);
+    cancelBtn.addEventListener("click", onCancel);
+  });
+}
+
 function playBurnAnimation(label) {
   return new Promise((resolve) => {
     const machine = document.getElementById("burnMachine");
@@ -217,7 +289,10 @@ async function doBurnSelected() {
     return;
   }
 
-  const confirmed = confirm("Burn " + selectedIds.size + " ArcPunk(s)? This is PERMANENT and cannot be undone.");
+  const confirmed = await showConfirmModal(
+    "Burn " + selectedIds.size + " ArcPunk" + (selectedIds.size > 1 ? "s" : "") + "?",
+    "This action is permanent. Burned NFTs are sent to a dead address and can never be recovered."
+  );
   if (!confirmed) return;
 
   burnBtn.disabled = true;
@@ -241,9 +316,9 @@ async function doBurnSelected() {
   renderWalletGrid();
 
   if (burned > 0) {
-    addNftBurnCount(burned);
-    updateGtdProgress();
-    showBurnSuccess(burned + " ArcPunk" + (burned > 1 ? "s" : "") + " burned. Keep going toward your next GTD spot.");
+    addNftBurns(burned);
+    updateGtdUI();
+    showBurnSuccess(burned + " ArcPunk" + (burned > 1 ? "s" : "") + " burned.");
   }
   statusEl.textContent = "";
   burnBtn.disabled = false;
@@ -251,6 +326,12 @@ async function doBurnSelected() {
 }
 
 async function doBurnPunk() {
+  const s = getState();
+  if (s.nftInCycle < NFT_REQUIRED) {
+    alert("Complete Step 1 first (burn 5 ArcPunks).");
+    return;
+  }
+
   const amountInput = document.getElementById("punkBurnAmount");
   const burnBtn = document.getElementById("burnPunkBtn");
   const amount = Number(amountInput.value);
@@ -260,7 +341,10 @@ async function doBurnPunk() {
     return;
   }
 
-  const confirmed = confirm("Burn " + amount.toLocaleString() + " $PUNK? This is PERMANENT and cannot be undone.");
+  const confirmed = await showConfirmModal(
+    "Burn " + amount.toLocaleString() + " $PUNK?",
+    "This action is permanent and cannot be undone."
+  );
   if (!confirmed) return;
 
   try {
@@ -274,10 +358,10 @@ async function doBurnPunk() {
 
     await playBurnAnimation(amount.toLocaleString() + " PUNK");
 
-    addPunkBurnCount(amount);
-    updateGtdProgress();
+    addPunkBurns(amount);
+    updateGtdUI();
     await refreshPunkBalance();
-    showBurnSuccess(amount.toLocaleString() + " $PUNK burned. Keep going toward your next GTD spot.");
+    showBurnSuccess(amount.toLocaleString() + " $PUNK burned.");
   } catch (err) {
     console.error(err);
     alert("Burn failed: " + (err.reason || err.message));
