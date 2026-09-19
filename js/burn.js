@@ -1,4 +1,4 @@
-﻿const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
+const NFT_CONTRACT_ADDRESS = "0x0b009536afcbe40e41197d1e633a437ed6e30ada";
 const PUNK_TOKEN_ADDRESS = "0xfd75D1873b3F8639CEFF2bB83c4cf728B8bfD661";
 const BURN_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 const READ_RPC_URL = "https://rpc.arc-scan.org";
@@ -159,8 +159,17 @@ function renderWalletGrid() {
   const grid = document.getElementById("walletGrid");
   const emptyMsg = document.getElementById("walletEmptyMsg");
   const countLabel = document.getElementById("walletCountLabel");
+  const selectedLabel = document.getElementById("selectedCountLabel");
 
   countLabel.textContent = walletTokenIds.length + " ArcPunk" + (walletTokenIds.length === 1 ? "" : "s") + " in wallet";
+
+  if (selectedIds.size > 0) {
+    selectedLabel.textContent = selectedIds.size + " selected";
+    selectedLabel.style.display = "inline";
+  } else {
+    selectedLabel.style.display = "none";
+  }
+
   grid.innerHTML = "";
 
   if (walletTokenIds.length === 0) {

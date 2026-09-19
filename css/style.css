@@ -1898,3 +1898,11 @@ header {
   .burnpg-step-head { flex-wrap: wrap; }
   .burnpg-headline { font-size: 1.9rem; }
 }
+
+/* ===== Selected count indicator ===== */
+.burnpg-selected-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #ff8a5c;
+  font-weight: 700;
+}
